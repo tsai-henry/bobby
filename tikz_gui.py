@@ -1,15 +1,78 @@
-import customtkinter as ctk
 import os
+import logging
+import queue
+import threading
+import customtkinter as ctk
+from PIL import Image
+import re
+from datetime import datetime
 from openai import OpenAI
 import tempfile
 import subprocess
 from PIL import Image, ImageTk
 from pdf2image import convert_from_path
-import re
-import threading
-import queue
-import logging
 import sys
+from dotenv import load_dotenv
+import asyncio
+
+# Global Constants and Configuration
+WINDOW_SIZE = "1200x800"
+WINDOW_TITLE = "Bobby"
+UPDATE_DELAY = 500  # ms for code preview updates
+LINE_LENGTH = 60  # characters per line for message bubbles
+LOADING_INTERVAL = 300  # ms between loading indicator updates
+MIN_BUBBLE_WIDTH = 30  # minimum width for message bubbles
+CHARS_PER_WIDTH_UNIT = 4  # number of characters per width unit
+MAX_BUBBLE_WIDTH = 200  # maximum width for message bubbles
+FONT_SIZE = 14  # base font size for text
+LOADING_SIZE = 150  # size of loading indicator
+
+# UI Colors
+DARK_BG = "#1E1E1E"
+CODE_BG = "#282C34"
+CODE_TEXT = "#ABB2BF"
+USER_BUBBLE_COLOR = "#2D5AF7"
+ASSISTANT_BUBBLE_COLOR = "#383B42"
+LOADING_FG = "#2D5AF7"
+
+# Syntax Highlighting Colors
+COMMAND_COLOR = "#C678DD"    # Purple for commands
+COMMENT_COLOR = "#98C379"    # Green for comments
+BRACKETS_COLOR = "#E5C07B"   # Yellow for brackets
+NUMBERS_COLOR = "#61AFEF"    # Blue for numbers
+CURLY_COLOR = "#56B6C2"      # Cyan for curly braces
+
+# Regex Patterns for Syntax Highlighting
+SYNTAX_PATTERNS = {
+    "command": re.compile(r"\\[a-zA-Z]+"),
+    "comment": re.compile(r"%[^\n]*"),
+    "brackets": re.compile(r"\[[^\]]*\]"),
+    "numbers": re.compile(r"\b\d+\.?\d*\b"),
+    "curly": re.compile(r"[{}]")
+}
+
+# System Prompts
+PROMPT_GENERATOR_SYSTEM_PROMPT = """You are an expert in creating detailed prompts for TikZ diagram generation.
+Your task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.
+Consider the following aspects when creating the prompt:
+1. Specific visual elements and their relationships
+2. Styling requirements (colors, line styles, etc.)
+3. Layout and positioning preferences
+4. Required TikZ libraries and features
+5. Any mathematical or technical requirements
+
+Output ONLY the detailed prompt without any explanations or additional text."""
+
+TIKZ_SYSTEM_PROMPT = """You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create 
+TikZ diagrams based on their descriptions. Follow these guidelines:
+1. Generate valid TikZ code that can be compiled
+2. Use appropriate TikZ libraries when needed
+3. Keep the code clean and well-commented
+4. Ensure the diagram fits within reasonable dimensions
+"""
+
+# Load environment variables
+load_dotenv() 
 
 # Configure logging
 logging.basicConfig(
@@ -29,23 +92,23 @@ class MessageBubble(ctk.CTkFrame):
         self.grid_columnconfigure(1 if is_user else 0, weight=1)
         self.grid_columnconfigure(0 if is_user else 1, weight=2)  # More space on the opposite side
         
-        # Create message label with word wrap
-        bubble_color = "#2D5AF7" if is_user else "#383B42"  # Blue for user, darker gray for assistant
-        text_color = "white"  # Always white text for dark theme
+        # Calculate appropriate dimensions based on message length
+        max_line_length = max(len(line) for line in message.split('\n'))
+        num_lines = (len(message) // LINE_LENGTH) + message.count('\n') + 1
+        estimated_height = max(25, min(300, num_lines * 20))
         
-        # Calculate appropriate height based on message length
-        line_length = 60  # characters per line
-        num_lines = (len(message) // line_length) + message.count('\n') + 1
-        estimated_height = max(25, min(300, num_lines * 20))  # min height 25, max 300
+        # Calculate width based on content
+        content_width = min(MAX_BUBBLE_WIDTH, max(MIN_BUBBLE_WIDTH, max_line_length * CHARS_PER_WIDTH_UNIT))
         
         self.message = ctk.CTkTextbox(
             self,
             wrap="word",
             height=estimated_height,
-            width=min(400, len(message) * 8),  # Dynamic width based on content
-            fg_color=bubble_color,
-            text_color=text_color,
+            width=content_width,
+            fg_color=USER_BUBBLE_COLOR if is_user else ASSISTANT_BUBBLE_COLOR,
+            text_color="white",
             corner_radius=15,
+            font=("Helvetica", FONT_SIZE),
             activate_scrollbars=False
         )
         
@@ -58,8 +121,8 @@ class MessageBubble(ctk.CTkFrame):
         self.message.grid(
             row=0,
             column=col,
-            padx=(20 if not is_user else 60, 60 if is_user else 20),
-            pady=5,
+            padx=(10 if not is_user else 0, 0 if is_user else 10),
+            pady=3,
             sticky="ew"
         )
 
@@ -67,15 +130,16 @@ class ChatFrame(ctk.CTkScrollableFrame):
     def __init__(self, parent):
         super().__init__(
             parent,
-            fg_color="#1E1E1E",  # Dark background
-            corner_radius=15
+            fg_color=DARK_BG,
+            corner_radius=15,
+            width=400  # Fixed width for chat frame
         )
         self.grid_columnconfigure(0, weight=1)
-    
+        
     def add_message(self, message, is_user=True):
         # Add some spacing between messages
         if len(self.grid_slaves()) > 0:
-            spacer = ctk.CTkFrame(self, fg_color="transparent", height=5)
+            spacer = ctk.CTkFrame(self, fg_color="transparent", height=2)
             spacer.grid(row=len(self.grid_slaves()), column=0, sticky="ew")
         
         bubble = MessageBubble(self, message, is_user)
@@ -91,36 +155,30 @@ class CodeView(ctk.CTkTextbox):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.configure(
-            font=("Courier", 14),
-            fg_color="#282C34",  # Dark background
-            text_color="#ABB2BF",  # Light gray text
+            font=("Courier", FONT_SIZE),
+            fg_color=CODE_BG,  # Dark background
+            text_color=CODE_TEXT,  # Light gray text
             wrap="none",  # No text wrapping for code
             padx=10,
             pady=10
         )
         
         # Initialize syntax highlighting colors
-        self.tag_config("command", foreground="#C678DD")    # Purple for commands
-        self.tag_config("comment", foreground="#98C379")    # Green for comments
-        self.tag_config("brackets", foreground="#E5C07B")   # Yellow for brackets
-        self.tag_config("numbers", foreground="#61AFEF")    # Blue for numbers
-        self.tag_config("curly", foreground="#56B6C2")      # Cyan for curly braces
+        self.tag_config("command", foreground=COMMAND_COLOR)    # Purple for commands
+        self.tag_config("comment", foreground=COMMENT_COLOR)    # Green for comments
+        self.tag_config("brackets", foreground=BRACKETS_COLOR)   # Yellow for brackets
+        self.tag_config("numbers", foreground=NUMBERS_COLOR)    # Blue for numbers
+        self.tag_config("curly", foreground=CURLY_COLOR)      # Cyan for curly braces
         
         # Compile regex patterns
-        self.patterns = {
-            "command": re.compile(r"\\[a-zA-Z]+"),
-            "comment": re.compile(r"%[^\n]*"),
-            "brackets": re.compile(r"\[[^\]]*\]"),
-            "numbers": re.compile(r"\b\d+\.?\d*\b"),
-            "curly": re.compile(r"[{}]")
-        }
+        self.patterns = SYNTAX_PATTERNS
         
         # Add key bindings for editing
         self.bind("<KeyRelease>", self.on_edit)
         
         # Add debounce for live preview
         self.update_timer = None
-        self.update_delay = 500  # ms
+        self.update_delay = UPDATE_DELAY  # ms
     
     def set_code(self, code):
         self.configure(state="normal")
@@ -176,37 +234,45 @@ class LoadingIndicator(ctk.CTkLabel):
         super().__init__(
             parent,
             text="",
-            fg_color="#2B2B2B",
-            corner_radius=10,
-            width=50,
-            height=20,
-            text_color="#FFFFFF"
+            fg_color="transparent",
+            width=LOADING_SIZE,
+            height=LOADING_SIZE,
+            font=("Helvetica", LOADING_SIZE),
+            text_color=LOADING_FG
         )
-        self.dots = 0
-        self.is_running = False
-    
+        self.animation_frames = ["◐", "◓", "◑", "◒"]
+        self.frame_index = 0
+        
+        # Center the loading indicator
+        self.place_forget()  # Remove grid placement
+        
     def start(self):
         self.is_running = True
-        self.update_dots()
-        self.grid()
+        # Center in parent widget
+        parent_width = self.master.winfo_width()
+        parent_height = self.master.winfo_height()
+        x = parent_width // 2 - LOADING_SIZE // 2
+        y = parent_height // 2 - LOADING_SIZE // 2
+        self.place(x=x, y=y)
+        self.update_animation()
     
     def stop(self):
         self.is_running = False
-        self.grid_remove()
+        self.place_forget()
     
-    def update_dots(self):
+    def update_animation(self):
         if not self.is_running:
             return
-        self.dots = (self.dots + 1) % 4
-        self.configure(text="." * self.dots)
-        self.after(500, self.update_dots)
+        self.frame_index = (self.frame_index + 1) % len(self.animation_frames)
+        self.configure(text=self.animation_frames[self.frame_index])
+        self.after(LOADING_INTERVAL, self.update_animation)
 
 class TikZGUI:
     def __init__(self):
         logging.info("Initializing TikZGUI")
         self.root = ctk.CTk()
-        self.root.title("TikZ Diagram Generator")
-        self.root.geometry("1200x800")
+        self.root.title(WINDOW_TITLE)
+        self.root.geometry(WINDOW_SIZE)
         
         # Set theme
         ctk.set_appearance_mode("dark")
@@ -215,13 +281,18 @@ class TikZGUI:
         # Initialize NVIDIA API client
         logging.info("Initializing NVIDIA API client")
         try:
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError("OPENAI_API_KEY not found in environment variables")
+            
+            logging.info(f"Using API key: {api_key[:10]}...")
             self.client = OpenAI(
                 base_url="https://integrate.api.nvidia.com/v1",
-                api_key="***REMOVED***"
+                api_key=api_key
             )
             logging.info("NVIDIA API client initialized successfully")
         except Exception as e:
-            logging.error(f"Failed to initialize NVIDIA API client: {str(e)}", exc_info=True)
+            logging.error(f"Failed to initialize NVIDIA API client: {str(e)}")
             raise
         
         self.current_code = ""
@@ -240,115 +311,106 @@ class TikZGUI:
     
     def create_gui_elements(self):
         # Main content frame (top part)
-        content_frame = ctk.CTkFrame(self.root, fg_color="#1E1E1E")
+        content_frame = ctk.CTkFrame(self.root, fg_color=DARK_BG)
         content_frame.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=10, pady=(10, 0))
         content_frame.grid_columnconfigure(0, weight=1)
-        content_frame.grid_columnconfigure(1, weight=1)
+        content_frame.grid_columnconfigure(1, weight=0)  # For the divider
+        content_frame.grid_columnconfigure(2, weight=1)
         content_frame.grid_rowconfigure(0, weight=1)
         
         # Left Panel (Code/Chat View)
-        self.left_frame = ctk.CTkFrame(content_frame, fg_color="#1E1E1E")
-        self.left_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 5))
-        self.left_frame.grid_rowconfigure(1, weight=1)
+        self.left_frame = ctk.CTkFrame(content_frame, fg_color=DARK_BG)
+        self.left_frame.grid(row=0, column=0, sticky="nsew")
+        self.left_frame.grid_rowconfigure(0, weight=1)
         self.left_frame.grid_columnconfigure(0, weight=1)
-        
-        # Create top bar with toggle button
-        top_bar = ctk.CTkFrame(self.left_frame, fg_color="#2B2B2B", height=40)
-        top_bar.grid(row=0, column=0, sticky="ew", pady=(0, 5))
-        top_bar.grid_propagate(False)
-        
-        self.toggle_button = ctk.CTkButton(
-            top_bar,
-            text="Show Code",
-            command=self.toggle_view,
-            width=100,
-            height=30,
-            corner_radius=15,
-            fg_color="#2D5AF7",
-            hover_color="#1E3EAC"
-        )
-        self.toggle_button.place(relx=0.5, rely=0.5, anchor="center")
         
         # Create both chat and code views
         self.chat_frame = ChatFrame(self.left_frame)
-        self.code_view = CodeView(self.left_frame)
-        self.code_view.set_parent_gui(self)
+        self.chat_frame.grid(row=0, column=0, sticky="n", padx=200)  # Center the chat frame
         
-        # Initially show chat view
-        self.chat_frame.grid(row=1, column=0, sticky="nsew")
+        self.code_view = CodeView(self.left_frame)
+        self.code_view.configure(font=("Courier", FONT_SIZE))
+        self.code_view.grid(row=0, column=0, sticky="nsew")
+        self.code_view.grid_remove()  # Initially hidden
+        
+        # Create a resizable divider
+        self.divider = ctk.CTkFrame(content_frame, width=5, fg_color="gray30", cursor="sb_h_double_arrow")
+        self.divider.grid(row=0, column=1, sticky="ns")
+        self.divider.bind("<B1-Motion>", self.resize_panels)
+        self.divider.bind("<Button-1>", self.start_resize)
+        self.divider.bind("<ButtonRelease-1>", self.stop_resize)
         
         # Right Panel (Diagram Display)
-        right_frame = ctk.CTkFrame(content_frame, fg_color="#1E1E1E")
-        right_frame.grid(row=0, column=1, sticky="nsew", padx=(5, 0))
+        right_frame = ctk.CTkFrame(content_frame, fg_color=DARK_BG)
+        right_frame.grid(row=0, column=2, sticky="nsew")
         right_frame.grid_columnconfigure(0, weight=1)
         right_frame.grid_rowconfigure(0, weight=1)
         
-        # White canvas for diagram display
-        canvas_frame = ctk.CTkFrame(right_frame, fg_color="white", corner_radius=15)
-        canvas_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
-        canvas_frame.grid_columnconfigure(0, weight=1)
-        canvas_frame.grid_rowconfigure(0, weight=1)
-        
-        self.canvas = ctk.CTkCanvas(canvas_frame, bg="white", highlightthickness=0)
-        self.canvas.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+        # Canvas for diagram display
+        self.canvas = ctk.CTkCanvas(right_frame, bg=DARK_BG, highlightthickness=0)
+        self.canvas.grid(row=0, column=0, sticky="nsew")
         
         # Loading indicator
-        self.loading_indicator = LoadingIndicator(right_frame)
-        self.loading_indicator.grid(row=1, column=0, padx=10, pady=10)
+        self.loading_indicator = LoadingIndicator(self.canvas)
         
-        # Bottom input area (centered)
+        # Bottom input area with view toggle
         input_frame = ctk.CTkFrame(self.root, fg_color="#2B2B2B", corner_radius=15, height=90)
-        input_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=200, pady=10)
-        input_frame.grid_propagate(False)
-        input_frame.grid_columnconfigure(0, weight=1)
+        input_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
+        input_frame.grid_columnconfigure(1, weight=1)
         
+        # View toggle segmented button
+        self.view_toggle = ctk.CTkSegmentedButton(
+            input_frame,
+            values=["Chat", "Code"],
+            command=self.toggle_view,
+            selected_color=USER_BUBBLE_COLOR,
+            unselected_color="gray30",
+            selected_hover_color=USER_BUBBLE_COLOR,
+            unselected_hover_color="gray40",
+            width=120,
+            font=("Helvetica", FONT_SIZE)
+        )
+        self.view_toggle.grid(row=0, column=0, padx=(10, 20), pady=10)
+        self.view_toggle.set("Chat")
+        
+        # Input field
         self.input_text = ctk.CTkTextbox(
             input_frame,
             height=50,
-            wrap="word",
-            fg_color="#383B42",
-            text_color="gray70",  # Start with translucent text
-            border_width=0,
-            corner_radius=10
+            corner_radius=10,
+            font=("Helvetica", FONT_SIZE)
         )
-        self.input_text.insert("1.0", "Describe the diagram you want to create...")
+        self.input_text.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady=(20, 20))
+        
+        # Bind events
         self.input_text.bind("<FocusIn>", lambda e: self.on_input_focus_in())
         self.input_text.bind("<FocusOut>", lambda e: self.on_input_focus_out())
         self.input_text.bind("<Return>", lambda e: self.on_enter_pressed(e))
         self.input_text.bind("<Key>", lambda e: self.on_key_press(e))
-        self.input_text.grid(row=0, column=0, sticky="ew", padx=10, pady=(20, 20))
         
-        # Send button
-        send_button = ctk.CTkButton(
-            input_frame,
-            text="Draw",
-            command=self.generate_diagram,
-            width=80,
-            height=35,
-            corner_radius=17,
-            fg_color="#2D5AF7",
-            hover_color="#1E3EAC"
-        )
-        send_button.grid(row=0, column=1, padx=10, pady=5)
+    def start_resize(self, event):
+        self.root.config(cursor="sb_h_double_arrow")
+        self.resize_start_x = event.x_root
+        self.initial_width = self.left_frame.winfo_width()
         
-        # Configure root grid
-        self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_rowconfigure(0, weight=1)
+    def stop_resize(self, event):
+        self.root.config(cursor="")
         
-        # Add welcome message
-        self.chat_frame.add_message("Welcome! Describe the diagram you want to create.", is_user=False)
+    def resize_panels(self, event):
+        if not hasattr(self, 'resize_start_x'):
+            return
+        diff = event.x_root - self.resize_start_x
+        new_width = max(200, min(self.initial_width + diff, self.root.winfo_width() - 400))
+        self.left_frame.configure(width=new_width)
     
     def toggle_view(self):
-        self.show_chat = not self.show_chat
+        self.show_chat = self.view_toggle.get() == "Chat"
         if self.show_chat:
             self.code_view.grid_remove()
-            self.chat_frame.grid(row=1, column=0, sticky="nsew")
-            self.toggle_button.configure(text="Show Code")
+            self.chat_frame.grid(row=0, column=0, sticky="n", padx=200)
         else:
             self.chat_frame.grid_remove()
-            self.code_view.grid(row=1, column=0, sticky="nsew")
-            self.toggle_button.configure(text="Show Chat")
-            # Set current code in editor
+            self.code_view.grid(row=0, column=0, sticky="nsew")
             if self.current_code:
                 self.code_view.set_code(self.current_code)
     
@@ -370,175 +432,183 @@ class TikZGUI:
             self.input_text.configure(text_color="white")  # Reset to full opacity
     
     def on_enter_pressed(self, event):
-        if event.state == 0:  # No modifiers (Shift, Control, etc.)
-            self.generate_diagram()
-            return "break"  # Prevents the newline from being inserted
-    
-    def generate_diagram(self):
-        # Get input text
+        """Handle Enter key press in input field."""
         user_input = self.input_text.get("1.0", "end-1c").strip()
-        if not user_input or user_input == "Describe the diagram you want to create...":
+        if not user_input:
+            return "break"
+        
+        # Clear input field
+        self.input_text.delete("1.0", "end")
+        
+        # Add message to chat
+        self.chat_frame.add_message(user_input, is_user=True)
+        
+        # Show loading indicator
+        self.loading_indicator.start()
+        
+        # Generate diagram
+        self.generate_diagram(user_input)
+        
+        # Schedule switch to code view after 5 seconds if this is the first prompt
+        if not hasattr(self, '_first_prompt_sent'):
+            self._first_prompt_sent = True
+            self.root.after(5000, self.switch_to_code_view)
+        
+        return "break"  # Prevent default behavior
+    
+    def switch_to_code_view(self):
+        """Switch to code view if we're currently in chat view"""
+        if self.show_chat:
+            self.toggle_view()
+    
+    def generate_diagram(self, user_input=None):
+        # Get input text
+        if user_input is None:
+            user_input = self.input_text.get("1.0", "end-1c").strip()
+        if not user_input:
             return
         
-        # Clear input
+        # Clear input field and show loading indicator
         self.input_text.delete("1.0", "end")
-        self.input_text.insert("1.0", "Describe the diagram you want to create...")
-        self.input_text.configure(text_color="gray70")
-        
-        # Add user message to chat
-        self.chat_frame.add_message(user_input, is_user=True)
+        self.loading_indicator.start()
         
         # Prepare messages for API
         messages = [
-            {"role": "system", "content": """Generate ONLY valid TikZ code. Your response must follow this EXACT format:
-
-\begin{tikzpicture}
-% Your TikZ commands here
-\end{tikzpicture}
-
-Rules:
-1. Keep it simple - just basic shapes and lines
-2. Use standard colors (red, blue, green, etc.)
-3. Center components at (0,0)
-4. No scaling or transformations
-5. No shadows or fancy effects
-
-DO NOT add ANY text before or after the code."""},
+            {"role": "system", "content": PROMPT_GENERATOR_SYSTEM_PROMPT},
             {"role": "user", "content": user_input}
         ]
         
-        # Start loading indicator
-        self.loading_indicator.start()
-        
-        # Clear previous diagram
-        self.canvas.delete("all")
-        
         # Start async task
-        threading.Thread(target=self.generate_diagram_async, args=(messages,)).start()
+        threading.Thread(target=lambda: asyncio.run(self.generate_diagram_async(messages))).start()
     
-    def generate_diagram_async(self, messages):
+    async def generate_diagram_async(self, messages):
+        """Generate TikZ diagram asynchronously using the NVIDIA API."""
         try:
-            # Stream the response
-            response_started = False
-            tikz_code = ""
+            # First, get a detailed prompt from the prompt generator
+            detailed_prompt_response = await asyncio.to_thread(
+                self.client.chat.completions.create,
+                model="meta/llama-3.3-70b-instruct",
+                messages=[
+                    {"role": "system", "content": PROMPT_GENERATOR_SYSTEM_PROMPT},
+                    {"role": "user", "content": messages[-1]["content"]}  # Use the last user message
+                ],
+                temperature=0.01,
+                top_p=0.7,
+                max_tokens=1024
+            )
             
-            logging.info("Making API request to NVIDIA")
-            logging.debug(f"Request messages: {messages}")
+            # Extract the detailed prompt
+            detailed_prompt = detailed_prompt_response.choices[0].message.content
+            print("Detailed prompt:", detailed_prompt)
             
-            try:
-                completion = self.client.chat.completions.create(
-                    model="meta/llama-3.3-70b-instruct",
-                    messages=messages,
-                    temperature=0.01,
-                    top_p=0.7,
-                    max_tokens=1024,  # Increased for more complex diagrams
-                    stream=True
-                )
-                logging.info("API request successful")
-            except Exception as e:
-                logging.error(f"API request failed: {str(e)}", exc_info=True)
-                if hasattr(e, 'response'):
-                    logging.error(f"Response status: {e.response.status_code}")
-                    logging.error(f"Response body: {e.response.text}")
-                raise
+            # Now use the detailed prompt to generate the TikZ diagram
+            tikz_messages = [
+                {"role": "system", "content": TIKZ_SYSTEM_PROMPT},
+                {"role": "system", "content": r"""Generate ONLY valid TikZ code. Your response must follow this EXACT format:
+
+\begin{tikzpicture}
+[Your TikZ code here]
+\end{tikzpicture}"""},
+                {"role": "user", "content": detailed_prompt}
+            ]
             
-            try:
-                for chunk in completion:
-                    if chunk.choices[0].delta.content:
-                        tikz_code += chunk.choices[0].delta.content
-                        if not response_started:
-                            logging.info("Started receiving response chunks")
-                            response_started = True
-                        self.root.update()
-                
-                logging.info("Finished receiving response")
-                logging.debug(f"Final TikZ code: {tikz_code}")
-                
-                # Clean up the code
-                tikz_code = self.clean_tikz_code(tikz_code)
-                
-                # Put result in queue
-                self.result_queue.put(tikz_code)
+            response = await asyncio.to_thread(
+                self.client.chat.completions.create,
+                model="meta/llama-3.3-70b-instruct",
+                messages=tikz_messages,
+                temperature=0.01,
+                top_p=0.7,
+                max_tokens=1024
+            )
             
-            except Exception as e:
-                logging.error(f"Error processing response chunks: {str(e)}", exc_info=True)
-                raise
-        
+            tikz_code = response.choices[0].message.content.strip()
+            if not tikz_code or not "\\begin{tikzpicture}" in tikz_code:
+                raise ValueError("Invalid TikZ code generated")
+            
+            # Put both prompts and the response in the result queue
+            result = {
+                "original_prompt": messages[-1]["content"],
+                "detailed_prompt": detailed_prompt,
+                "tikz_code": tikz_code
+            }
+            self.result_queue.put(result)
+            
         except Exception as e:
-            logging.error(f"Error in generate_diagram_async: {str(e)}", exc_info=True)
-            # Put exception in queue
-            self.result_queue.put(e)
+            logging.error(f"Error in generate_diagram_async: {str(e)}")
+            self.result_queue.put({"error": str(e)})
     
-    def clean_tikz_code(self, code):
-        """Clean and validate TikZ code."""
-        # Remove backticks and language markers
-        code = re.sub(r'```(?:tikz)?\n?', '', code)
-        code = code.strip()
-        
-        # Ensure proper tikzpicture environment
-        if not "\\begin{tikzpicture}" in code:
-            code = "\\begin{tikzpicture}\n" + code
-        
-        if not "\\end{tikzpicture}" in code:
-            code = code + "\n\\end{tikzpicture}"
-        
-        logging.info("Cleaned TikZ code")
-        logging.debug(f"Clean code: {code}")
-        
-        return code
-        
     def render_tikz(self, tikz_code):
         try:
             logging.info("Starting TikZ rendering")
+            if not tikz_code or not tikz_code.strip():
+                raise ValueError("Empty TikZ code")
+                
             logging.debug(f"Rendering code: {tikz_code}")
             
-            # Create a temporary directory
-            with tempfile.TemporaryDirectory() as temp_dir:
-                logging.debug(f"Created temp directory: {temp_dir}")
-                
-                # Write the complete LaTeX document
-                tex_path = os.path.join(temp_dir, "diagram.tex")
-                with open(tex_path, "w") as f:
-                    latex_doc = """\\documentclass[tikz,border=10pt]{standalone}
-\\usepackage{tikz}
-\\begin{document}
-""" + tikz_code + """
-\\end{document}"""
-                    f.write(latex_doc)
-                logging.debug(f"Wrote LaTeX file: {tex_path}")
-                
-                # Compile LaTeX to PDF
-                logging.info("Running pdflatex")
-                result = subprocess.run(["pdflatex", "-output-directory", temp_dir, tex_path], 
-                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                
-                if result.returncode != 0:
-                    error_msg = f"pdflatex failed with code {result.returncode}\n"
-                    error_msg += f"STDOUT:\n{result.stdout}\n"
-                    error_msg += f"STDERR:\n{result.stderr}"
-                    raise Exception(error_msg)
-                
-                # Convert PDF to image
-                pdf_path = os.path.join(temp_dir, "diagram.pdf")
-                if not os.path.exists(pdf_path):
-                    raise Exception(f"PDF file not created at {pdf_path}")
-                
-                logging.info("Converting PDF to image")
+            # Create temp directory
+            temp_dir = tempfile.mkdtemp()
+            logging.debug(f"Created temp directory: {temp_dir}")
+            
+            # Create LaTeX document
+            latex_content = r"""\documentclass{standalone}
+\usepackage{tikz}
+\begin{document}
+%s
+\end{document}
+""" % tikz_code
+
+            # Write LaTeX file
+            tex_path = os.path.join(temp_dir, "diagram.tex")
+            with open(tex_path, "w") as f:
+                f.write(latex_content)
+            logging.debug(f"Wrote LaTeX file: {tex_path}")
+            
+            # Run pdflatex
+            logging.info("Running pdflatex")
+            pdf_path = os.path.join(temp_dir, "diagram.pdf")
+            result = subprocess.run(
+                ["pdflatex", "-interaction=nonstopmode", "-output-directory", temp_dir, tex_path],
+                capture_output=True,
+                text=True
+            )
+            
+            if result.returncode != 0:
+                error_msg = result.stderr or result.stdout
+                logging.error(f"pdflatex error: {error_msg}")
+                raise RuntimeError(f"Failed to compile LaTeX: {error_msg}")
+            
+            if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
+                raise RuntimeError("PDF file was not created or is empty")
+            
+            # Convert PDF to image
+            logging.info("Converting PDF to image")
+            try:
                 images = convert_from_path(pdf_path)
-                
-                if images:
-                    logging.info("Successfully converted PDF to image")
-                    image = images[0]
-                    self.root.after(0, lambda: self.update_canvas_with_image(image))
-                else:
-                    raise Exception("Failed to convert PDF to image")
+                if not images:
+                    raise RuntimeError("No images were generated from PDF")
                     
+                image = images[0]
+                logging.info("Successfully converted PDF to image")
+                
+                # Update canvas with new image
+                self.update_canvas_with_image(image)
+                
+            except Exception as e:
+                logging.error(f"Error converting PDF to image: {str(e)}")
+                raise RuntimeError(f"Failed to convert PDF to image: {str(e)}")
+                
         except Exception as e:
-            logging.error(f"Error in render_tikz: {str(e)}", exc_info=True)
-            def show_error():
-                error_message = f"Error rendering diagram: {str(e)}"
-                self.chat_frame.add_message(error_message, is_user=False)
-            self.root.after(0, show_error)
+            logging.error(f"Error in render_tikz: {str(e)}")
+            self.chat_frame.add_message(f"Error rendering diagram: {str(e)}", is_user=False)
+        finally:
+            # Clean up temp directory
+            try:
+                if 'temp_dir' in locals():
+                    import shutil
+                    shutil.rmtree(temp_dir)
+            except Exception as e:
+                logging.error(f"Error cleaning up temp directory: {str(e)}")
+
     
     def render_tikz_async(self, tikz_code):
         # Start async task
@@ -580,33 +650,41 @@ DO NOT add ANY text before or after the code."""},
             logging.info("Successfully updated canvas with new image")
     
     def update_ui_with_result(self, result):
-        tikz_code = result
-        
-        # Store and display the code
-        self.current_code = tikz_code
-        if not self.show_chat:
-            self.code_view.set_code(tikz_code)
-        
-        # Show in chat if in chat view
-        if self.show_chat:
-            self.chat_frame.add_message(tikz_code, is_user=False)
-        
-        # Render TikZ code
-        self.render_tikz_async(tikz_code)
-        
-        # Stop loading indicator
-        self.loading_indicator.stop()
-    
+        if "error" in result:
+            error_message = f"Error: {result['error']}"
+            self.chat_frame.add_message(error_message, is_user=False)
+            self.loading_indicator.stop()
+            return
+
+        try:
+            tikz_code = result["tikz_code"]
+            
+            # Store and display the code
+            self.current_code = tikz_code
+            if not self.show_chat:
+                self.code_view.set_code(tikz_code)
+            
+            # Show in chat if in chat view
+            if self.show_chat:
+                if "detailed_prompt" in result:
+                    self.chat_frame.add_message("Generating diagram with the following details:\n" + result["detailed_prompt"], is_user=False)
+                self.chat_frame.add_message(tikz_code, is_user=False)
+            
+            # Render TikZ code
+            self.render_tikz_async(tikz_code)
+            
+        except Exception as e:
+            logging.error(f"Error updating UI: {str(e)}")
+            self.chat_frame.add_message(f"Error updating UI: {str(e)}", is_user=False)
+        finally:
+            # Stop loading indicator
+            self.loading_indicator.stop()
+
     def check_results(self):
         try:
             while True:
                 result = self.result_queue.get_nowait()
-                if isinstance(result, Exception):
-                    self.chat_frame.add_message(f"Error: {str(result)}", is_user=False)
-                    self.loading_indicator.stop()
-                else:
-                    self.update_ui_with_result(result)
-                self.result_queue.task_done()
+                self.update_ui_with_result(result)
         except queue.Empty:
             pass
         finally:

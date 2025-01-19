@@ -1,4 +1,4 @@
-# TikZ Diagram Generator
+# Bobby
 
 A modern GUI application that converts natural language descriptions into TikZ diagrams using NVIDIA's LLaMA API. Create beautiful mathematical diagrams, flowcharts, and technical illustrations with simple text descriptions.
 
