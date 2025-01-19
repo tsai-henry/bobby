@@ -17,7 +17,7 @@ import asyncio
 import shutil
 
 # Global Constants and Configuration
-WINDOW_SIZE = "1200x800"
+WINDOW_SIZE = "1800x1200"
 WINDOW_TITLE = "Bobby"
 UPDATE_DELAY = 500  # ms for code preview updates
 LINE_LENGTH = 60  # characters per line for message bubbles
@@ -26,7 +26,7 @@ MIN_BUBBLE_WIDTH = 50  # minimum width for message bubbles
 CHARS_PER_WIDTH_UNIT = 1  # number of characters per width unit
 MAX_BUBBLE_WIDTH = 300  # maximum width for message bubbles
 FONT_SIZE = 18  # base font size for text
-LOADING_SIZE = 50  # size of loading indicator
+LOADING_SIZE = 20  # size of loading indicator
 CHAT_WIDTH = 500  # width of chat frame
 
 # UI Colors
@@ -122,47 +122,47 @@ class MessageBubble(ctk.CTkFrame):
 
 class ChatFrame(ctk.CTkScrollableFrame):
     def __init__(self, parent):
-        super().__init__(
-            parent,
-            fg_color=DARK_BG,
-            corner_radius=15,
-            width=CHAT_WIDTH,
-            height=400  # Fixed height for smooth scrolling
-        )
+        super().__init__(parent, fg_color=DARK_BG)
         self.grid_columnconfigure(0, weight=1)
-        
-        # Keep track of messages for smooth scrolling
         self.messages = []
-        self.current_scroll = 0.0
-        self.target_scroll = 0.0
-        self.animation_id = None
-    
-    def add_message(self, message, is_user=True):
-        if len(self.grid_slaves()) > 0:
-            spacer = ctk.CTkFrame(self, fg_color="transparent", height=2)
-            spacer.grid(row=len(self.grid_slaves()), column=0, sticky="ew")
         
-        bubble = MessageBubble(self, message, is_user)
-        bubble.grid(row=len(self.grid_slaves()), column=0, sticky="ew")
+        # Loading indicator at bottom
+        self.loading_frame = ctk.CTkFrame(self, fg_color=DARK_BG, height=30)
+        self.loading_frame.grid(row=1000, column=0, sticky="ew", pady=(5, 0))  # High row number to keep at bottom
+        self.loading_frame.grid_columnconfigure(0, weight=1)
+        self.loading_frame.grid_propagate(False)
+        
+        self.loading_indicator = LoadingIndicator(self.loading_frame)
+        self.loading_indicator.grid(row=0, column=0)
+        self.loading_indicator.grid_remove()  # Hidden by default
+
+    def add_message(self, text, is_user=False):
+        # Create message bubble
+        bubble = MessageBubble(self, text, is_user)
+        row = len(self.messages)
+        bubble.grid(row=row, column=0, sticky="ew", pady=(0, 10))
         self.messages.append(bubble)
-        
-        # Start smooth scroll animation
-        self.target_scroll = 1.0
-        if self.animation_id:
-            self.after_cancel(self.animation_id)
         self.smooth_scroll_to_bottom()
     
+    def start_loading(self):
+        self.loading_indicator.grid()
+        self.loading_indicator.start()
+        self.smooth_scroll_to_bottom()
+    
+    def stop_loading(self):
+        self.loading_indicator.stop()
+        self.loading_indicator.grid_remove()
+
     def smooth_scroll_to_bottom(self):
         """Smoothly scroll to the bottom of the chat"""
         try:
             current = float(self._parent_canvas.yview()[1])
-            if abs(self.target_scroll - current) > 0.01:
-                next_pos = current + (self.target_scroll - current) * 0.3
+            if abs(1.0 - current) > 0.01:
+                next_pos = current + (1.0 - current) * 0.3
                 self._parent_canvas.yview_moveto(next_pos)
-                self.animation_id = self.after(20, self.smooth_scroll_to_bottom)
+                self.after(20, self.smooth_scroll_to_bottom)
             else:
                 self._parent_canvas.yview_moveto(1.0)
-                self.animation_id = None
         except Exception as e:
             logging.error(f"Scroll error: {str(e)}")
             self._parent_canvas.yview_moveto(1.0)
@@ -245,37 +245,85 @@ class CodeView(ctk.CTkTextbox):
     def set_parent_gui(self, gui):
         self.parent_gui = gui
 
-class LoadingIndicator(ctk.CTkLabel):
+class LoadingIndicator:
     def __init__(self, parent):
-        super().__init__(
-            parent,
-            text="◐",
-            fg_color="transparent",
+        self.frame = ctk.CTkFrame(parent, fg_color="transparent", width=LOADING_SIZE, height=LOADING_SIZE)
+        self.canvas = ctk.CTkCanvas(
+            self.frame,
             width=LOADING_SIZE,
             height=LOADING_SIZE,
-            font=("Helvetica", LOADING_SIZE),
-            text_color=LOADING_FG
+            bg="#2B2B2B",
+            highlightthickness=0
         )
-        self.animation_frames = ["◐", "◓", "◑", "◒"]
-        self.frame_index = 0
-        self.is_running = False
+        self.canvas.place(relx=0.5, rely=0.5, anchor="center")
+        self.angle = 0
+        self.running = False
         
+    def draw_spinner(self):
+        size = LOADING_SIZE
+        center = size / 2
+        radius = (size - 4) / 2  # Slightly smaller than canvas
+        
+        # Clear previous drawing
+        self.canvas.delete("spinner")
+        
+        # Draw arc
+        start_angle = self.angle
+        extent = 300  # Leave a gap in the circle
+        
+        # Create gradient effect with multiple arcs
+        width = 3
+        segments = 8
+        for i in range(segments):
+            seg_extent = extent / segments
+            seg_start = start_angle + (i * seg_extent)
+            opacity = 0.3 + (0.7 * i / segments)  # Fade from 0.3 to 1.0
+            color = self._get_color_with_opacity(USER_BUBBLE_COLOR, opacity)
+            
+            self.canvas.create_arc(
+                2, 2, size-2, size-2,
+                start=seg_start,
+                extent=seg_extent,
+                width=width,
+                outline=color,
+                style="arc",
+                tags="spinner"
+            )
+        
+        if self.running:
+            self.angle = (self.angle + 10) % 360
+            self.canvas.after(50, self.draw_spinner)
+    
+    def _get_color_with_opacity(self, color, opacity):
+        # Convert hex color to RGB values
+        r = int(color[1:3], 16)
+        g = int(color[3:5], 16)
+        b = int(color[5:7], 16)
+        # For Tkinter, we need to use standard color names or #RRGGBB format
+        # We'll blend with background color instead of using opacity
+        bg_color = (43, 43, 43)  # #2B2B2B background
+        blended_r = int(r * opacity + bg_color[0] * (1 - opacity))
+        blended_g = int(g * opacity + bg_color[1] * (1 - opacity))
+        blended_b = int(b * opacity + bg_color[2] * (1 - opacity))
+        return f"#{blended_r:02x}{blended_g:02x}{blended_b:02x}"
+    
     def start(self):
-        self.is_running = True
-        self.lift()  # Bring to front
-        self.place(relx=0.5, rely=0.5, anchor="center")  # Center in parent
-        self.update_animation()
+        if not self.running:
+            self.running = True
+            self.draw_spinner()
     
     def stop(self):
-        self.is_running = False
-        self.place_forget()
+        self.running = False
+        self.canvas.delete("spinner")
     
-    def update_animation(self):
-        if not self.is_running:
-            return
-        self.frame_index = (self.frame_index + 1) % len(self.animation_frames)
-        self.configure(text=self.animation_frames[self.frame_index])
-        self.after(LOADING_INTERVAL, self.update_animation)
+    def grid(self, *args, **kwargs):
+        self.frame.grid(*args, **kwargs)
+    
+    def grid_remove(self):
+        self.frame.grid_remove()
+    
+    def grid_forget(self):
+        self.frame.grid_forget()
 
 class TikZGUI:
     def __init__(self):
@@ -337,42 +385,16 @@ class TikZGUI:
         self.left_frame.grid(row=0, column=0, sticky="nsew")
         self.left_frame.grid_propagate(False)  # Maintain width
         self.left_frame.grid_columnconfigure(0, weight=1)
-        self.left_frame.grid_rowconfigure(0, weight=0)  # For toggle
-        self.left_frame.grid_rowconfigure(1, weight=1)  # For chat/code
-        
-        # View toggle at top
-        toggle_frame = ctk.CTkFrame(self.left_frame, fg_color="transparent")
-        toggle_frame.grid(row=0, column=0, pady=10)
-        
-        self.view_toggle = ctk.CTkSegmentedButton(
-            toggle_frame,
-            values=["Chat", "Code"],
-            command=self.toggle_view,
-            selected_color=USER_BUBBLE_COLOR,
-            unselected_color="gray30",
-            selected_hover_color=USER_BUBBLE_COLOR,
-            unselected_hover_color="gray40",
-            width=120,
-            height=32,
-            font=("Helvetica", FONT_SIZE)
-        )
-        self.view_toggle.pack(pady=5)
-        self.view_toggle.set("Chat")
-        
-        # Container frame for chat and code views
-        self.view_container = ctk.CTkFrame(self.left_frame, fg_color=DARK_BG)
-        self.view_container.grid(row=1, column=0, sticky="nsew")
-        self.view_container.grid_columnconfigure(0, weight=1)
-        self.view_container.grid_rowconfigure(0, weight=1)
+        self.left_frame.grid_rowconfigure(1, weight=1)  # Main content area
         
         # Chat Frame
-        self.chat_frame = ChatFrame(self.view_container)
-        self.chat_frame.grid(row=0, column=0, sticky="nsew", padx=50)
+        self.chat_frame = ChatFrame(self.left_frame)
+        self.chat_frame.grid(row=1, column=0, sticky="nsew")
         
         # Code View
-        self.code_view = CodeView(self.view_container)
+        self.code_view = CodeView(self.left_frame)
         self.code_view.configure(font=("Courier", FONT_SIZE))
-        self.code_view.grid(row=0, column=0, sticky="nsew", padx=10)
+        self.code_view.grid(row=1, column=0, sticky="nsew")
         self.code_view.grid_remove()
         
         # Resizable divider
@@ -395,47 +417,69 @@ class TikZGUI:
         self.canvas.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
         
         # Bottom input area
-        input_frame = ctk.CTkFrame(self.root, fg_color="#2B2B2B", corner_radius=15, height=60)
+        input_frame = ctk.CTkFrame(self.root, fg_color="#2B2B2B", corner_radius=15, height=50)
         input_frame.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
-        input_frame.grid_columnconfigure(1, weight=1)
+        input_frame.grid_columnconfigure(0, weight=1)  # Left spacing
+        input_frame.grid_columnconfigure(1, weight=0)  # Toggle
+        input_frame.grid_columnconfigure(2, weight=0)  # Loading
+        input_frame.grid_columnconfigure(3, weight=0)  # Input
+        input_frame.grid_columnconfigure(4, weight=0)  # Enter
+        input_frame.grid_columnconfigure(5, weight=1)  # Right spacing
         input_frame.grid_propagate(False)
+        
+        # View toggle at left
+        self.view_toggle = ctk.CTkSegmentedButton(
+            input_frame,
+            values=["Chat", "Code"],
+            command=self.toggle_view,
+            selected_color=USER_BUBBLE_COLOR,
+            unselected_color="gray30",
+            selected_hover_color=USER_BUBBLE_COLOR,
+            unselected_hover_color="gray40",
+            width=100,
+            height=32,
+            font=("Helvetica", FONT_SIZE-2),
+            dynamic_resizing=False
+        )
+        self.view_toggle.grid(row=0, column=1, padx=10)
+        self.view_toggle.set("Chat")
         
         # Loading indicator
         self.loading_indicator = LoadingIndicator(input_frame)
-        self.loading_indicator.grid(row=0, column=0, padx=10)
+        self.loading_indicator.grid(row=0, column=2, padx=5)
         
         # Input field
-        self.input_text = ctk.CTkTextbox(
+        self.input_text = ctk.CTkEntry(
             input_frame,
-            height=40,
+            height=32,
+            width=800,
             corner_radius=10,
             font=("Helvetica", FONT_SIZE),
-            wrap="word",
             fg_color="#383B42",
-            text_color="white"
+            text_color="white",
+            justify="left"  # Left-aligned text
         )
-        self.input_text.grid(row=0, column=1, sticky="ew", padx=5, pady=10)
-        self.input_text.insert("1.0", "Describe the diagram you want to create...")
+        self.input_text.grid(row=0, column=3, padx=5, pady=9)
+        self.input_text.insert(0, "Describe the diagram you want to create...")
         
         # Enter button
         self.enter_button = ctk.CTkButton(
             input_frame,
             text="➜",
-            width=40,
-            height=40,
-            corner_radius=20,
+            width=32,
+            height=32,
+            corner_radius=16,
             fg_color=USER_BUBBLE_COLOR,
             hover_color="#1E3EAC",
             font=("Helvetica", FONT_SIZE),
-            command=lambda: self.on_enter_pressed(None)
+            command=self.submit_input
         )
-        self.enter_button.grid(row=0, column=2, padx=10)
+        self.enter_button.grid(row=0, column=4, padx=10)
         
         # Bind events
-        self.input_text.bind("<FocusIn>", lambda e: self.on_input_focus_in())
-        self.input_text.bind("<FocusOut>", lambda e: self.on_input_focus_out())
-        self.input_text.bind("<Return>", lambda e: self.on_enter_pressed(e))
-        self.input_text.bind("<Key>", lambda e: self.on_key_press(e))
+        self.input_text.bind("<FocusIn>", self.on_input_focus_in)
+        self.input_text.bind("<FocusOut>", self.on_input_focus_out)
+        self.input_text.bind("<Return>", self.submit_input)
         
         # Add welcome message
         self.chat_frame.add_message("Welcome! Describe the diagram you want to create.", is_user=False)
@@ -451,19 +495,19 @@ class TikZGUI:
             
         if self.show_chat:
             self.code_view.grid_remove()
-            self.chat_frame.grid(row=0, column=0, sticky="nsew", padx=50)
+            self.chat_frame.grid(row=1, column=0, sticky="nsew")
             # Ensure latest messages are visible
             self.chat_frame.smooth_scroll_to_bottom()
         else:
             self.chat_frame.grid_remove()
-            self.code_view.grid(row=0, column=0, sticky="nsew", padx=10)
+            self.code_view.grid(row=1, column=0, sticky="nsew")
             if self.current_code:
                 self.code_view.set_code(self.current_code)
     
     def start_resize(self, event):
         """Start panel resizing operation"""
         self.root.config(cursor="sb_h_double_arrow")
-        self.resize_start_x = event.x_root
+        self.start_x = event.x_root
         self.initial_width = self.left_frame.winfo_width()
     
     def stop_resize(self, event):
@@ -471,136 +515,105 @@ class TikZGUI:
         self.root.config(cursor="")
         
     def resize_panels(self, event):
-        """Handle panel resizing during mouse drag"""
-        if not hasattr(self, 'resize_start_x'):
+        """Handle panel resizing"""
+        if not hasattr(self, 'initial_width'):
             return
-        diff = event.x_root - self.resize_start_x
+            
+        # Calculate new width based on mouse position
+        diff = event.x_root - self.start_x
         new_width = max(400, min(self.initial_width + diff, self.root.winfo_width() - 400))
+        
+        # Update immediately without waiting for next frame
         self.left_frame.configure(width=new_width)
-    
-    def on_input_focus_in(self):
-        if self.input_text.get("1.0", "end-1c") == "Describe the diagram you want to create...":
-            self.input_text.delete("1.0", "end")
+        self.root.update_idletasks()
+
+    def on_input_focus_in(self, event):
+        if self.input_text.get() == "Describe the diagram you want to create...":
+            self.input_text.delete(0, "end")
             self.input_text.configure(text_color="white")  # Reset to full opacity
     
-    def on_input_focus_out(self):
-        if not self.input_text.get("1.0", "end-1c").strip():
-            self.input_text.delete("1.0", "end")
-            self.input_text.insert("1.0", "Describe the diagram you want to create...")
+    def on_input_focus_out(self, event):
+        if not self.input_text.get().strip():
+            self.input_text.delete(0, "end")
+            self.input_text.insert(0, "Describe the diagram you want to create...")
             self.input_text.configure(text_color="gray70")  # Make placeholder text translucent
     
-    def on_key_press(self, event):
-        # If it's the first keypress and the placeholder is still there, clear it
-        if self.input_text.get("1.0", "end-1c") == "Describe the diagram you want to create...":
-            self.input_text.delete("1.0", "end")
-            self.input_text.configure(text_color="white")  # Reset to full opacity
-    
-    def on_enter_pressed(self, event):
-        """Handle Enter key press in input field."""
-        user_input = self.input_text.get("1.0", "end-1c").strip()
-        if not user_input:
-            return "break"
+    def submit_input(self, event=None):
+        """Handle input submission"""
+        if self.loading_indicator.running:
+            return
+            
+        text = self.input_text.get().strip()
+        if not text or text == "Describe the diagram you want to create...":
+            return
+            
+        self.chat_frame.add_message(text, is_user=True)
+        self.input_text.delete(0, "end")
+        self.input_text.insert(0, "")
         
-        # Clear input field
-        self.input_text.delete("1.0", "end")
-        
-        # Add message to chat
-        self.chat_frame.add_message(user_input, is_user=True)
-        
-        # Show loading indicator
         self.loading_indicator.start()
-        
-        # Generate diagram
-        self.generate_diagram(user_input)
-        
-        # Schedule switch to code view after 5 seconds if this is the first prompt
-        if not hasattr(self, '_first_prompt_sent'):
-            self._first_prompt_sent = True
-            self.root.after(5000, self.switch_to_code_view)
-        
-        return "break"  # Prevent default behavior
-    
-    def switch_to_code_view(self):
-        """Switch to code view if we're currently in chat view"""
-        if self.show_chat:
-            self.toggle_view()
+        self.process_input_async(text)
     
     def generate_diagram(self, user_input=None):
-        # Get input text
-        if user_input is None:
-            user_input = self.input_text.get("1.0", "end-1c").strip()
-        if not user_input:
-            return
-        
-        # Clear input field and show loading indicator
-        self.input_text.delete("1.0", "end")
-        self.loading_indicator.start()
-        
-        # Prepare messages for API
-        messages = [
-            {"role": "system", "content": PROMPT_GENERATOR_SYSTEM_PROMPT},
-            {"role": "user", "content": user_input}
-        ]
-        
-        # Start async task
-        threading.Thread(target=lambda: asyncio.run(self.generate_diagram_async(messages))).start()
+        """Generate TikZ diagram"""
+        try:
+            # Get input text
+            if user_input is None:
+                user_input = self.input_text.get().strip()
+            if not user_input:
+                return
+            
+            # Clear input
+            self.input_text.delete(0, "end")
+            self.loading_indicator.start()
+            
+            # Prepare messages for API
+            messages = [
+                {"role": "system", "content": TIKZ_SYSTEM_PROMPT},
+                {"role": "user", "content": f"""
+Please create a TikZ diagram based on this description: {user_input}
+
+Important requirements:
+1. Use ONLY RGB colors in format like 'rgb,255:red,173;green,216;blue,230' - DO NOT use named colors
+2. Include all necessary TikZ libraries
+3. Make the diagram clean and professional
+4. Respond with a brief explanation followed by the code in a tikz code block
+"""}
+            ]
+            
+            # Make API call
+            response = self.client.chat_completion(messages)
+            
+            # Process response
+            self.process_response(response)
+            
+        except Exception as e:
+            logging.error(f"Error generating diagram: {str(e)}")
+            self.chat_frame.add_message(f"Error generating diagram: {str(e)}", is_user=False)
+            self.loading_indicator.stop()
     
     async def generate_diagram_async(self, messages):
         """Generate TikZ diagram asynchronously using the NVIDIA API."""
         try:
-            # First, get a detailed prompt from the prompt generator
-            detailed_prompt_response = await asyncio.to_thread(
-                self.client.chat.completions.create,
-                model="meta/llama-3.3-70b-instruct",
-                messages=[
-                    {"role": "system", "content": PROMPT_GENERATOR_SYSTEM_PROMPT},
-                    {"role": "user", "content": messages[-1]["content"]}  # Use the last user message
-                ],
-                temperature=0.01,
-                top_p=0.7,
-                max_tokens=1024
-            )
-            
-            # Extract the detailed prompt
-            detailed_prompt = detailed_prompt_response.choices[0].message.content
-            print("Detailed prompt:", detailed_prompt)
-            
-            # Now use the detailed prompt to generate the TikZ diagram
-            tikz_messages = [
-                {"role": "system", "content": TIKZ_SYSTEM_PROMPT},
-                {"role": "system", "content": r"""Generate ONLY valid TikZ code. Your response must follow this EXACT format:
-
-\begin{tikzpicture}
-[Your TikZ code here]
-\end{tikzpicture}"""},
-                {"role": "user", "content": detailed_prompt}
-            ]
-            
+            # Make API call
             response = await asyncio.to_thread(
                 self.client.chat.completions.create,
                 model="meta/llama-3.3-70b-instruct",
-                messages=tikz_messages,
+                messages=messages,
                 temperature=0.01,
                 top_p=0.7,
                 max_tokens=1024
             )
             
-            tikz_code = response.choices[0].message.content.strip()
-            if not tikz_code or not "\\begin{tikzpicture}" in tikz_code:
-                raise ValueError("Invalid TikZ code generated")
-            
-            # Put both prompts and the response in the result queue
-            result = {
-                "original_prompt": messages[-1]["content"],
-                "detailed_prompt": detailed_prompt,
-                "tikz_code": tikz_code
-            }
-            self.result_queue.put(result)
+            # Process in main thread
+            self.root.after(0, lambda: self.process_response(response))
             
         except Exception as e:
-            logging.error(f"Error in generate_diagram_async: {str(e)}")
-            self.result_queue.put({"error": str(e)})
-    
+            logging.error(f"Error generating diagram: {str(e)}")
+            self.root.after(0, lambda: self.handle_error(str(e)))
+        finally:
+            self.root.after(100, self.check_results)
+
     def render_tikz(self, tikz_code):
         """Render TikZ code to PDF and convert to PNG"""
         try:
@@ -616,8 +629,7 @@ class TikZGUI:
                 tikz_content = tikz_code[start:end]
             
             # Create LaTeX document with proper color definitions
-            latex_code = r"""
-\documentclass[tikz,border=10pt]{standalone}
+            latex_template = r"""\documentclass[tikz,border=10pt]{standalone}
 \usepackage{tikz}
 \usepackage[dvipsnames,svgnames,x11names]{xcolor}
 \usetikzlibrary{automata,arrows,backgrounds,fit,positioning,shapes}
@@ -630,9 +642,10 @@ class TikZGUI:
 \definecolor{lightgray}{RGB}{211,211,211}
 
 \begin{document}
-%s
+{content}
 \end{document}
-""" % tikz_content
+"""
+            latex_code = latex_template.replace("{content}", tikz_content)
             
             tex_file = os.path.join(temp_dir, "diagram.tex")
             with open(tex_file, "w") as f:
@@ -744,8 +757,6 @@ class TikZGUI:
             
             # Show in chat if in chat view
             if self.show_chat:
-                if "detailed_prompt" in result:
-                    self.chat_frame.add_message("Generating diagram with the following details:\n" + result["detailed_prompt"], is_user=False)
                 self.chat_frame.add_message(tikz_code, is_user=False)
             
             # Render TikZ code
@@ -768,9 +779,54 @@ class TikZGUI:
         finally:
             self.root.after(100, self.check_results)
 
+    def process_input_async(self, text):
+        self.generate_diagram(text)
+
+    def process_response(self, response):
+        """Process the API response"""
+        try:
+            # Extract the assistant's response
+            content = response.choices[0].message.content
+            
+            # Extract TikZ code from the response
+            tikz_code = None
+            if "```tikz" in content:
+                start = content.find("```tikz") + 6
+                end = content.find("```", start)
+                tikz_code = content[start:end].strip()
+            
+            # Add only the text response to chat (excluding the code)
+            text_response = content
+            if tikz_code:
+                # Get everything before the code block
+                pre_code = content[:content.find("```tikz")].strip()
+                # Get everything after the code block
+                post_code = content[content.find("```", start) + 3:].strip()
+                # Combine non-code parts
+                text_response = f"{pre_code}\n\n{post_code}".strip()
+            
+            if text_response:
+                self.chat_frame.add_message(text_response, is_user=False)
+            
+            # If we have TikZ code, try to render it
+            if tikz_code:
+                success = self.render_tikz(tikz_code)
+                if success:
+                    self.current_code = tikz_code
+                
+            self.loading_indicator.stop()
+            
+        except Exception as e:
+            logging.error(f"Error processing response: {str(e)}")
+            self.chat_frame.add_message("Error processing response", is_user=False)
+            self.loading_indicator.stop()
+    
+    def mainloop(self):
+        self.root.mainloop()
+
 def main():
     app = TikZGUI()
-    app.root.mainloop()
+    app.mainloop()
 
 if __name__ == "__main__":
     main()

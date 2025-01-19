@@ -6858,3 +6858,1037 @@ Transcript written on diagram.log.
 2025-01-18 20:13:29,536 - DEBUG - request_id: None
 2025-01-18 20:13:29,570 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmpzyuiirjm
 2025-01-18 20:13:29,570 - ERROR - Error in render_tikz: unsupported format character 'D' (0x44) at index 185
+2025-01-18 20:13:54,018 - INFO - Initializing TikZGUI
+2025-01-18 20:13:54,131 - INFO - Initializing NVIDIA API client
+2025-01-18 20:13:54,131 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:13:54,147 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:13:54,283 - INFO - TikZGUI initialization complete
+2025-01-18 20:13:58,524 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:13:58,527 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'red circle'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:13:58,549 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:13:58,550 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:13:58,553 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x12022ecf0>
+2025-01-18 20:13:58,553 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x110a96b10> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:13:58,657 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x12027c410>
+2025-01-18 20:13:58,657 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:13:58,657 - DEBUG - send_request_headers.complete
+2025-01-18 20:13:58,658 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:13:58,658 - DEBUG - send_request_body.complete
+2025-01-18 20:13:58,658 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:14:00,294 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:14:00 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'707'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'55d58672-8b31-4bc5-b178-3b75e41465ab'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:00,295 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:14:00,295 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:14:00,295 - DEBUG - receive_response_body.complete
+2025-01-18 20:14:00,295 - DEBUG - response_closed.started
+2025-01-18 20:14:00,295 - DEBUG - response_closed.complete
+2025-01-18 20:14:00,295 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:14:00 GMT'), ('content-type', 'application/json'), ('content-length', '707'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '55d58672-8b31-4bc5-b178-3b75e41465ab'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:00,295 - DEBUG - request_id: None
+2025-01-18 20:14:00,303 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram featuring a single red circle with a radius of 1cm, positioned at the origin (0,0), filled with a solid red color (rgb:255,0,0), and drawn with a 1pt thick black border, using the TikZ library "shapes.geometric" and rendered in a 2D Cartesian coordinate system with a grid size of 1cm and a visible axis range of (-2,-2) to (2,2).'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:14:00,303 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:14:00,303 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:14:00,304 - DEBUG - send_request_headers.complete
+2025-01-18 20:14:00,304 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:14:00,304 - DEBUG - send_request_body.complete
+2025-01-18 20:14:00,304 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:14:03,367 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:14:03 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'960'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'0c46dc0a-3be5-48e6-b62d-4334a73a46fb'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:03,367 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:14:03,367 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:14:03,367 - DEBUG - receive_response_body.complete
+2025-01-18 20:14:03,367 - DEBUG - response_closed.started
+2025-01-18 20:14:03,367 - DEBUG - response_closed.complete
+2025-01-18 20:14:03,367 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:14:03 GMT'), ('content-type', 'application/json'), ('content-length', '960'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '0c46dc0a-3be5-48e6-b62d-4334a73a46fb'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:03,367 - DEBUG - request_id: None
+2025-01-18 20:14:03,383 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp4xjpfign
+2025-01-18 20:14:03,383 - ERROR - Error in render_tikz: unsupported format character 'D' (0x44) at index 185
+2025-01-18 20:14:35,201 - INFO - Initializing TikZGUI
+2025-01-18 20:14:35,336 - INFO - Initializing NVIDIA API client
+2025-01-18 20:14:35,336 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:14:35,361 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:14:35,493 - INFO - TikZGUI initialization complete
+2025-01-18 20:14:40,357 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:14:40,359 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'red circle'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:14:40,383 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:14:40,383 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:14:40,387 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11622ecf0>
+2025-01-18 20:14:40,387 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x107502b10> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:14:40,476 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11627c410>
+2025-01-18 20:14:40,476 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:14:40,477 - DEBUG - send_request_headers.complete
+2025-01-18 20:14:40,477 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:14:40,477 - DEBUG - send_request_body.complete
+2025-01-18 20:14:40,477 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:14:42,073 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:14:42 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'707'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'd9dd4a76-4a22-4c0b-95c9-dbe901fbe52c'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:42,074 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:14:42,074 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:14:42,074 - DEBUG - receive_response_body.complete
+2025-01-18 20:14:42,074 - DEBUG - response_closed.started
+2025-01-18 20:14:42,074 - DEBUG - response_closed.complete
+2025-01-18 20:14:42,074 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:14:42 GMT'), ('content-type', 'application/json'), ('content-length', '707'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', 'd9dd4a76-4a22-4c0b-95c9-dbe901fbe52c'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:42,074 - DEBUG - request_id: None
+2025-01-18 20:14:42,082 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram featuring a single red circle with a radius of 1cm, positioned at the origin (0,0), filled with a solid red color (rgb:255,0,0), and drawn with a 1pt thick black border, using the TikZ library "shapes.geometric" and rendered in a 2D Cartesian coordinate system with a grid size of 1cm and a visible axis range of (-2,-2) to (2,2).'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:14:42,082 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:14:42,082 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:14:42,082 - DEBUG - send_request_headers.complete
+2025-01-18 20:14:42,082 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:14:42,083 - DEBUG - send_request_body.complete
+2025-01-18 20:14:42,083 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:14:45,452 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:14:45 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'1048'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'ef5126b2-c051-4bf4-a44d-2074486cc6ef'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:45,452 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:14:45,452 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:14:45,452 - DEBUG - receive_response_body.complete
+2025-01-18 20:14:45,452 - DEBUG - response_closed.started
+2025-01-18 20:14:45,452 - DEBUG - response_closed.complete
+2025-01-18 20:14:45,452 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:14:45 GMT'), ('content-type', 'application/json'), ('content-length', '1048'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', 'ef5126b2-c051-4bf4-a44d-2074486cc6ef'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:14:45,452 - DEBUG - request_id: None
+2025-01-18 20:14:45,538 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmpy13hej50
+2025-01-18 20:14:45,538 - DEBUG - Wrote LaTeX file: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmpy13hej50/diagram.tex
+2025-01-18 20:14:45,538 - INFO - Running pdflatex
+2025-01-18 20:14:45,917 - DEBUG - STREAM b'IHDR' 16 13
+2025-01-18 20:14:45,917 - DEBUG - STREAM b'IDAT' 41 11069
+2025-01-18 20:15:30,439 - INFO - Initializing TikZGUI
+2025-01-18 20:15:30,562 - INFO - Initializing NVIDIA API client
+2025-01-18 20:15:30,562 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:15:30,584 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:15:30,766 - INFO - TikZGUI initialization complete
+2025-01-18 20:15:37,239 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:15:37,243 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'red circle'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:15:37,273 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:15:37,273 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:15:37,277 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11946ecf0>
+2025-01-18 20:15:37,277 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10c16ab10> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:15:37,379 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x1194bc410>
+2025-01-18 20:15:37,379 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:15:37,380 - DEBUG - send_request_headers.complete
+2025-01-18 20:15:37,380 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:15:37,380 - DEBUG - send_request_body.complete
+2025-01-18 20:15:37,380 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:15:39,008 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:15:39 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'707'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'8f5f8a4a-6042-4b4c-b956-0ef7109cdee6'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:15:39,008 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:15:39,008 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:15:39,008 - DEBUG - receive_response_body.complete
+2025-01-18 20:15:39,008 - DEBUG - response_closed.started
+2025-01-18 20:15:39,009 - DEBUG - response_closed.complete
+2025-01-18 20:15:39,009 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:15:39 GMT'), ('content-type', 'application/json'), ('content-length', '707'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '8f5f8a4a-6042-4b4c-b956-0ef7109cdee6'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:15:39,009 - DEBUG - request_id: None
+2025-01-18 20:15:39,014 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram featuring a single red circle with a radius of 1cm, positioned at the origin (0,0), filled with a solid red color (rgb:255,0,0), and drawn with a 1pt thick black border, using the TikZ library "shapes.geometric" and rendered in a 2D Cartesian coordinate system with a grid size of 1cm and a visible axis range of (-2,-2) to (2,2).'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:15:39,015 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:15:39,015 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:15:39,015 - DEBUG - send_request_headers.complete
+2025-01-18 20:15:39,015 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:15:39,015 - DEBUG - send_request_body.complete
+2025-01-18 20:15:39,015 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:15:41,977 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:15:42 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'960'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'a0adc2b2-8cde-4ea5-ac4b-2e032bdec8fd'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:15:41,977 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:15:41,977 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:15:41,977 - DEBUG - receive_response_body.complete
+2025-01-18 20:15:41,977 - DEBUG - response_closed.started
+2025-01-18 20:15:41,977 - DEBUG - response_closed.complete
+2025-01-18 20:15:41,977 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:15:42 GMT'), ('content-type', 'application/json'), ('content-length', '960'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', 'a0adc2b2-8cde-4ea5-ac4b-2e032bdec8fd'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:15:41,978 - DEBUG - request_id: None
+2025-01-18 20:15:41,996 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmplog8t32f
+2025-01-18 20:15:41,996 - DEBUG - Wrote LaTeX file: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmplog8t32f/diagram.tex
+2025-01-18 20:15:41,996 - INFO - Running pdflatex
+2025-01-18 20:15:42,388 - DEBUG - STREAM b'IHDR' 16 13
+2025-01-18 20:15:42,388 - DEBUG - STREAM b'IDAT' 41 11069
+2025-01-18 20:16:33,139 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:16:33,143 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'fsm'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:16:33,143 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:16:33,144 - DEBUG - close.started
+2025-01-18 20:16:33,144 - DEBUG - close.complete
+2025-01-18 20:16:33,144 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:16:33,146 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x1194bee90>
+2025-01-18 20:16:33,146 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10c16ab10> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:16:33,211 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x10c1aba80>
+2025-01-18 20:16:33,211 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:16:33,211 - DEBUG - send_request_headers.complete
+2025-01-18 20:16:33,211 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:16:33,211 - DEBUG - send_request_body.complete
+2025-01-18 20:16:33,211 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:16:36,966 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:16:37 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'1313'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'1ba4d23e-fd89-48ea-841f-7c065a131dd4'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:16:36,966 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:16:36,966 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:16:36,966 - DEBUG - receive_response_body.complete
+2025-01-18 20:16:36,966 - DEBUG - response_closed.started
+2025-01-18 20:16:36,967 - DEBUG - response_closed.complete
+2025-01-18 20:16:36,967 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:16:37 GMT'), ('content-type', 'application/json'), ('content-length', '1313'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '1ba4d23e-fd89-48ea-841f-7c065a131dd4'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:16:36,967 - DEBUG - request_id: None
+2025-01-18 20:16:36,969 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram of a finite state machine (FSM) with 5 states (q0 to q4) and 6 transitions, using the `automata` library. The states should be represented as circles with a minimum size of 1cm, filled with a light blue color (#ADD8E6), and have a black border with a line width of 0.5pt. The transitions should be labeled with their corresponding input symbols (a, b, c) and have arrowheads with a length of 5pt. The layout should be positioned with q0 at the top, q1 and q2 below it, and q3 and q4 at the bottom, with a node distance of 2.5cm. The transition from q0 to q1 should be labeled "a" and have a bend angle of 30 degrees, while the transition from q2 to q3 should be labeled "b" and have a loop shape with a minimum size of 1cm. Use the `arrows` library to customize the arrowheads and the `fit` library to ensure proper sizing of the diagram. The background should be set to a light gray color (#F7F7F7) and the font size should be 10pt.'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:16:36,969 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:16:36,969 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:16:36,969 - DEBUG - send_request_headers.complete
+2025-01-18 20:16:36,969 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:16:36,969 - DEBUG - send_request_body.complete
+2025-01-18 20:16:36,969 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:16:43,795 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:16:43 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'1569'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'f0bed185-7d64-49a7-a78e-dc9dc9c85aa9'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:16:43,795 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:16:43,795 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:16:43,795 - DEBUG - receive_response_body.complete
+2025-01-18 20:16:43,795 - DEBUG - response_closed.started
+2025-01-18 20:16:43,795 - DEBUG - response_closed.complete
+2025-01-18 20:16:43,795 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:16:43 GMT'), ('content-type', 'application/json'), ('content-length', '1569'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', 'f0bed185-7d64-49a7-a78e-dc9dc9c85aa9'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:16:43,795 - DEBUG - request_id: None
+2025-01-18 20:16:43,863 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmppo_xbqta
+2025-01-18 20:16:43,863 - DEBUG - Wrote LaTeX file: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmppo_xbqta/diagram.tex
+2025-01-18 20:16:43,863 - INFO - Running pdflatex
+2025-01-18 20:16:44,135 - ERROR - pdflatex error: This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(/var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmppo_xbqta/diagram.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/standalone/standalone.cls
+Document Class: standalone 2022/10/10 v1.3b Class to compile TeX sub-files stan
+dalone
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/tools/shellesc.sty)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/iftex/ifluatex.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/iftex/iftex.sty))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/xkeyval/keyval.tex))))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/standalone/standalone.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/size10.clo))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-comm
+on.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-late
+x.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.
+tex (/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/pgf.revision.tex))
+) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty
+ (/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.cod
+e.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibra
+ryfiltered.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdf
+tex.def
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-com
+mon-pdf.def)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoft
+path.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprot
+ocol.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.cod
+e.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathparser.cod
+e.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+basic.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+trigonometric.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+random.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+comparison.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+base.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+round.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+misc.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+integerarithmetics.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code
+.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoin
+ts.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+construct.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+usage.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescop
+es.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregrap
+hicstate.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sformations.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequic
+k.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobje
+cts.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+processing.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearro
+ws.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshad
+e.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimag
+e.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexte
+rnal.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelaye
+rs.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sparency.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatt
+erns.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.
+code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleshape
+s.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.
+code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-0-65.sty)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-1-18.sty))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex)) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgffor.code.
+tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tik
+z.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibrarypl
+othandlers.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmodulematri
+x.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarytopaths.code.tex))))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/dvipsnam.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/svgnam.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/x11nam.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryautomata.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.multipart.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.multipart.code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryarrows.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibraryar
+rows.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarybackgrounds.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryfit.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarypositioning.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.geometric.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.geometric.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.misc.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.misc.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.symbols.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.symbols.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.arrows.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.arrows.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.callouts.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.callouts.code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/l3backend/l3backend-pdftex.d
+ef)
+No file diagram.aux.
+(/usr/local/texlive/2024basic/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.s
+ty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+))
+
+! LaTeX Error: Can be used only in preamble.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15     \usepackage
+                    {tikz}
+Missing character: There is no t in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no k in font nullfont!
+Missing character: There is no z in font nullfont!
+! Undefined control sequence.
+\pgfkeyscurrentkey ->\background 
+                                 
+l.18 ...in{scope}[on background layer=\background]
+                                                  
+! Illegal parameter number in definition of \tikz@temp.
+<to be read again> 
+                   A
+l.22 ...black, line width=0.5pt, minimum size=1cm]
+                                                   (q0) at (0,2) {$q_0$};
+! Illegal parameter number in definition of \tikz@options.
+<to be read again> 
+                   A
+l.22 ...black, line width=0.5pt, minimum size=1cm]
+                                                   (q0) at (0,2) {$q_0$};
+! Illegal parameter number in definition of \tikz@fillcolor.
+<to be read again> 
+                   A
+l.22 ...black, line width=0.5pt, minimum size=1cm]
+                                                   (q0) at (0,2) {$q_0$};
+! Illegal parameter number in definition of \tikz@options.
+<to be read again> 
+                   A
+l.22 ...black, line width=0.5pt, minimum size=1cm]
+                                                   (q0) at (0,2) {$q_0$};
+! Illegal parameter number in definition of \tikz@options.
+<to be read again> 
+                   A
+l.22 ...black, line width=0.5pt, minimum size=1cm]
+                                                   (q0) at (0,2) {$q_0$};
+! Illegal parameter number in definition of \@@clr.
+<to be read again> 
+                   A
+l.22 ..., minimum size=1cm] (q0) at (0,2) {$q_0$};
+                                                  
+
+! Package xcolor Error: Undefined color `##ADD8E6'.
+
+See the xcolor package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.22 ..., minimum size=1cm] (q0) at (0,2) {$q_0$};
+                                                  
+! Missing \endcsname inserted.
+<to be read again> 
+                   \futurelet 
+l.22 ..., minimum size=1cm] (q0) at (0,2) {$q_0$};
+                                                  
+! Missing \endcsname inserted.
+<to be read again> 
+                   \futurelet 
+l.22 ..., minimum size=1cm] (q0) at (0,2) {$q_0$};
+                                                  
+! Undefined control sequence.
+\pgfmathsetlength ...\pgfmath@onquick #2\pgfmath@ 
+                                                  {\begingroup \pgfmath@sele...
+l.22 ..., minimum size=1cm] (q0) at (0,2) {$q_0$};
+                                                  
+)
+! Incomplete \iffalse; all text was ignored after line 22.
+<inserted text> 
+                \fi 
+<*> ...3dv23184qdr0000gn/T/tmppo_xbqta/diagram.tex
+                                                  
+! Emergency stop.
+<*> ...3dv23184qdr0000gn/T/tmppo_xbqta/diagram.tex
+                                                  
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on diagram.log.
+
+2025-01-18 20:16:44,136 - ERROR - Error in render_tikz: Error: Invalid color name used in diagram. Please use standard color names or RGB values.
+2025-01-18 20:17:17,451 - INFO - Initializing TikZGUI
+2025-01-18 20:17:17,585 - INFO - Initializing NVIDIA API client
+2025-01-18 20:17:17,585 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:17:17,610 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:17:17,750 - INFO - TikZGUI initialization complete
+2025-01-18 20:17:21,705 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:17:21,713 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'red circle'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:17:21,754 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:17:21,754 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:17:21,758 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11c02acf0>
+2025-01-18 20:17:21,758 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10cf96a80> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:17:21,852 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11c0782d0>
+2025-01-18 20:17:21,852 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:17:21,853 - DEBUG - send_request_headers.complete
+2025-01-18 20:17:21,853 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:17:21,853 - DEBUG - send_request_body.complete
+2025-01-18 20:17:21,853 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:17:23,046 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:17:23 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'635'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'96f197de-622c-4e1b-a5dd-49554cbb782c'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:17:23,046 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:17:23,046 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:17:23,046 - DEBUG - receive_response_body.complete
+2025-01-18 20:17:23,046 - DEBUG - response_closed.started
+2025-01-18 20:17:23,046 - DEBUG - response_closed.complete
+2025-01-18 20:17:23,046 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:17:23 GMT'), ('content-type', 'application/json'), ('content-length', '635'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '96f197de-622c-4e1b-a5dd-49554cbb782c'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:17:23,046 - DEBUG - request_id: None
+2025-01-18 20:17:23,052 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram featuring a single red circle with a radius of 1cm, positioned at the origin (0,0), filled with a solid red color (#FF0000), and drawn with a thick black line (line width = 1pt); utilize the TikZ library "shapes.geometric" to ensure precise circle rendering.'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:17:23,052 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:17:23,053 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:17:23,053 - DEBUG - send_request_headers.complete
+2025-01-18 20:17:23,053 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:17:23,053 - DEBUG - send_request_body.complete
+2025-01-18 20:17:23,053 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:17:24,571 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:17:24 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'666'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'4d7ec09a-656d-4d0e-8370-c9e7acc31046'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:17:24,571 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:17:24,571 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:17:24,571 - DEBUG - receive_response_body.complete
+2025-01-18 20:17:24,571 - DEBUG - response_closed.started
+2025-01-18 20:17:24,571 - DEBUG - response_closed.complete
+2025-01-18 20:17:24,571 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:17:24 GMT'), ('content-type', 'application/json'), ('content-length', '666'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '4d7ec09a-656d-4d0e-8370-c9e7acc31046'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:17:24,571 - DEBUG - request_id: None
+2025-01-18 20:17:24,626 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmpqnj5zhor
+2025-01-18 20:17:24,627 - DEBUG - Wrote LaTeX file: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmpqnj5zhor/diagram.tex
+2025-01-18 20:17:24,627 - INFO - Running pdflatex
+2025-01-18 20:17:24,995 - DEBUG - STREAM b'IHDR' 16 13
+2025-01-18 20:17:24,995 - DEBUG - STREAM b'IDAT' 41 5907
+2025-01-18 20:18:49,615 - INFO - Initializing TikZGUI
+2025-01-18 20:18:49,734 - INFO - Initializing NVIDIA API client
+2025-01-18 20:18:49,734 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:18:49,756 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:18:49,873 - INFO - TikZGUI initialization complete
+2025-01-18 20:18:54,126 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:18:54,129 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'red circle'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:18:54,155 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:18:54,155 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:18:54,159 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x118d0eba0>
+2025-01-18 20:18:54,159 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10b9f2b10> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:18:54,265 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x118d582d0>
+2025-01-18 20:18:54,266 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:18:54,266 - DEBUG - send_request_headers.complete
+2025-01-18 20:18:54,266 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:18:54,266 - DEBUG - send_request_body.complete
+2025-01-18 20:18:54,266 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:18:55,429 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:18:55 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'635'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'32f432cd-6a24-4730-ac94-fd4d77fb2846'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:18:55,430 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:18:55,430 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:18:55,430 - DEBUG - receive_response_body.complete
+2025-01-18 20:18:55,430 - DEBUG - response_closed.started
+2025-01-18 20:18:55,430 - DEBUG - response_closed.complete
+2025-01-18 20:18:55,430 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:18:55 GMT'), ('content-type', 'application/json'), ('content-length', '635'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '32f432cd-6a24-4730-ac94-fd4d77fb2846'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:18:55,430 - DEBUG - request_id: None
+2025-01-18 20:18:55,436 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram featuring a single red circle with a radius of 1cm, positioned at the origin (0,0), filled with a solid red color (#FF0000), and drawn with a thick black line (line width = 1pt); utilize the TikZ library "shapes.geometric" to ensure precise circle rendering.'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:18:55,437 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:18:55,437 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:18:55,437 - DEBUG - send_request_headers.complete
+2025-01-18 20:18:55,437 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:18:55,437 - DEBUG - send_request_body.complete
+2025-01-18 20:18:55,437 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:18:56,946 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:18:57 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'672'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'7ae0e853-87be-4cbd-980d-01de92f7ef93'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:18:56,946 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:18:56,946 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:18:56,946 - DEBUG - receive_response_body.complete
+2025-01-18 20:18:56,946 - DEBUG - response_closed.started
+2025-01-18 20:18:56,946 - DEBUG - response_closed.complete
+2025-01-18 20:18:56,946 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:18:57 GMT'), ('content-type', 'application/json'), ('content-length', '672'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '7ae0e853-87be-4cbd-980d-01de92f7ef93'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:18:56,946 - DEBUG - request_id: None
+2025-01-18 20:18:56,991 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp57mfoapi
+2025-01-18 20:18:56,992 - DEBUG - Wrote LaTeX file: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp57mfoapi/diagram.tex
+2025-01-18 20:18:56,992 - INFO - Running pdflatex
+2025-01-18 20:18:57,363 - DEBUG - STREAM b'IHDR' 16 13
+2025-01-18 20:18:57,363 - DEBUG - STREAM b'IDAT' 41 5907
+2025-01-18 20:19:01,584 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:19:01,592 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'fsm of car'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:19:01,593 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:19:01,594 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:01,594 - DEBUG - send_request_headers.complete
+2025-01-18 20:19:01,595 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:19:01,595 - DEBUG - send_request_body.complete
+2025-01-18 20:19:01,595 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:06,878 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:19:06 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'1732'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'720c572f-a5a2-4d8a-afa3-49c7f715993f'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:06,879 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:19:06,879 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:19:06,879 - DEBUG - receive_response_body.complete
+2025-01-18 20:19:06,879 - DEBUG - response_closed.started
+2025-01-18 20:19:06,879 - DEBUG - response_closed.complete
+2025-01-18 20:19:06,879 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:19:06 GMT'), ('content-type', 'application/json'), ('content-length', '1732'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '720c572f-a5a2-4d8a-afa3-49c7f715993f'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:06,879 - DEBUG - request_id: None
+2025-01-18 20:19:06,881 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram of a finite state machine (FSM) representing the states and transitions of a car, with the following specifications:\n- States: "parked", "idle", "accelerating", "cruising", "braking", and "stopped"\n- Transitions: \n  - "parked" to "idle" upon ignition\n  - "idle" to "accelerating" upon throttle press\n  - "accelerating" to "cruising" upon reaching a certain speed\n  - "cruising" to "braking" upon brake press\n  - "braking" to "stopped" upon coming to a complete stop\n  - "stopped" to "idle" upon throttle press\n  - "idle" to "parked" upon ignition off\n- Styling: \n  - States as rounded rectangles with a minimum width of 2cm and a minimum height of 1cm\n  - Transitions as arrows with a line width of 0.5pt and an arrowhead size of 2pt\n  - Colors: states as lightblue, transitions as black\n- Layout: \n  - States positioned in a grid layout with 2 rows and 3 columns, with a horizontal separation of 2cm and a vertical separation of 2cm\n  - Transitions positioned to minimize overlap and improve readability\n- Required TikZ libraries: \n  - "automata"\n  - "arrows"\n- Mathematical requirements: \n  - None\n- Additional features: \n  - Initial state "parked" marked with a double circle\n  - All transitions labeled with their corresponding actions (e.g., "ignition", "throttle press", etc.)'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:19:06,881 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:19:06,881 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:06,882 - DEBUG - send_request_headers.complete
+2025-01-18 20:19:06,882 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:19:06,882 - DEBUG - send_request_body.complete
+2025-01-18 20:19:06,882 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:13,227 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:19:13 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'1696'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'f12f9a09-cf19-4ddb-8e7d-18b618a672b7'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:13,227 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:19:13,227 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:19:13,227 - DEBUG - receive_response_body.complete
+2025-01-18 20:19:13,227 - DEBUG - response_closed.started
+2025-01-18 20:19:13,227 - DEBUG - response_closed.complete
+2025-01-18 20:19:13,227 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:19:13 GMT'), ('content-type', 'application/json'), ('content-length', '1696'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', 'f12f9a09-cf19-4ddb-8e7d-18b618a672b7'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:13,227 - DEBUG - request_id: None
+2025-01-18 20:19:13,257 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp243mju3d
+2025-01-18 20:19:13,257 - DEBUG - Wrote LaTeX file: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp243mju3d/diagram.tex
+2025-01-18 20:19:13,257 - INFO - Running pdflatex
+2025-01-18 20:19:13,628 - DEBUG - STREAM b'IHDR' 16 13
+2025-01-18 20:19:13,628 - DEBUG - STREAM b'IDAT' 41 65536
+2025-01-18 20:19:27,126 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:19:27,130 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': "You are an expert in creating detailed prompts for TikZ diagram generation.\nYour task is to take a user's request and create a more detailed and specific prompt that will help generate high-quality TikZ diagrams.\nConsider the following aspects when creating the prompt:\n1. Specific visual elements and their relationships\n2. Styling requirements (colors, line styles, etc.)\n3. Layout and positioning preferences\n4. Required TikZ libraries and features\n5. Any mathematical or technical requirements\n\nOutput ONLY the detailed prompt without any explanations or additional text."}, {'role': 'user', 'content': 'fsm of food growth'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:19:27,130 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:19:27,131 - DEBUG - close.started
+2025-01-18 20:19:27,131 - DEBUG - close.complete
+2025-01-18 20:19:27,131 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:19:27,133 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x118d5b610>
+2025-01-18 20:19:27,133 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10b9f2b10> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:19:27,186 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x1195156e0>
+2025-01-18 20:19:27,187 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:27,187 - DEBUG - send_request_headers.complete
+2025-01-18 20:19:27,187 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:19:27,187 - DEBUG - send_request_body.complete
+2025-01-18 20:19:27,187 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:32,170 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:19:32 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'1722'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'fa43944a-c6d7-47ed-9876-362dd75c4cec'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:32,171 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:19:32,171 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:19:32,171 - DEBUG - receive_response_body.complete
+2025-01-18 20:19:32,171 - DEBUG - response_closed.started
+2025-01-18 20:19:32,171 - DEBUG - response_closed.complete
+2025-01-18 20:19:32,171 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:19:32 GMT'), ('content-type', 'application/json'), ('content-length', '1722'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', 'fa43944a-c6d7-47ed-9876-362dd75c4cec'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:32,171 - DEBUG - request_id: None
+2025-01-18 20:19:32,173 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'system', 'content': 'Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\n\\begin{tikzpicture}\n[Your TikZ code here]\n\\end{tikzpicture}'}, {'role': 'user', 'content': 'Create a TikZ diagram of a finite state machine (FSM) representing the stages of food growth, with the following specifications: \nThe FSM has five states: "Seed", "Sprout", "Sapling", "Mature", and "Harvest", represented as elliptical nodes with a minimum size of 1cm, filled with a light green color (#C6F4D6), and labeled with a bold, black font. \nThe states are connected by directed edges, representing the transitions between stages, with arrowheads of size 5pt, line width of 1pt, and color #008000 (green). \nThe edge from "Seed" to "Sprout" is labeled as "Water" with a font size of 10pt, the edge from "Sprout" to "Sapling" is labeled as "Nutrients" with a font size of 10pt, the edge from "Sapling" to "Mature" is labeled as "Growth" with a font size of 10pt, and the edge from "Mature" to "Harvest" is labeled as "Ripening" with a font size of 10pt. \nThe layout of the FSM is arranged horizontally, with the states positioned at equal distances of 3cm apart, and the edges are drawn with a bend of 30 degrees to improve readability. \nThe TikZ libraries required for this diagram are "shapes" and "arrows", and the "automate" package is used to simplify the creation of the FSM. \nThe diagram is drawn on a canvas with a size of 15cm x 5cm, and the background is set to a white color (#FFFFFF) to improve contrast.'}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:19:32,173 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:19:32,174 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:32,174 - DEBUG - send_request_headers.complete
+2025-01-18 20:19:32,174 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:19:32,174 - DEBUG - send_request_body.complete
+2025-01-18 20:19:32,174 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:19:37,598 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:19:37 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'1379'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'0f592dcc-d366-4225-80d5-439725f593b7'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:37,598 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:19:37,598 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:19:37,598 - DEBUG - receive_response_body.complete
+2025-01-18 20:19:37,598 - DEBUG - response_closed.started
+2025-01-18 20:19:37,598 - DEBUG - response_closed.complete
+2025-01-18 20:19:37,598 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:19:37 GMT'), ('content-type', 'application/json'), ('content-length', '1379'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '0f592dcc-d366-4225-80d5-439725f593b7'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:19:37,598 - DEBUG - request_id: None
+2025-01-18 20:19:37,611 - DEBUG - Created temp directory: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp4uwik3nn
+2025-01-18 20:19:37,611 - DEBUG - Wrote LaTeX file: /var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp4uwik3nn/diagram.tex
+2025-01-18 20:19:37,611 - INFO - Running pdflatex
+2025-01-18 20:19:37,877 - ERROR - pdflatex error: This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(/var/folders/z5/0bm0f8bn6qg5d3dv23184qdr0000gn/T/tmp4uwik3nn/diagram.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/standalone/standalone.cls
+Document Class: standalone 2022/10/10 v1.3b Class to compile TeX sub-files stan
+dalone
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/tools/shellesc.sty)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/iftex/ifluatex.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/iftex/iftex.sty))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/xkeyval/keyval.tex))))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/standalone/standalone.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/size10.clo))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-comm
+on.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-late
+x.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.
+tex (/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/pgf.revision.tex))
+) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty
+ (/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.cod
+e.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibra
+ryfiltered.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdf
+tex.def
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-com
+mon-pdf.def)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoft
+path.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprot
+ocol.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.cod
+e.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathparser.cod
+e.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+basic.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+trigonometric.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+random.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+comparison.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+base.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+round.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+misc.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+integerarithmetics.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code
+.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoin
+ts.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+construct.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+usage.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescop
+es.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregrap
+hicstate.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sformations.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequic
+k.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobje
+cts.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+processing.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearro
+ws.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshad
+e.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimag
+e.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexte
+rnal.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelaye
+rs.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sparency.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatt
+erns.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.
+code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleshape
+s.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.
+code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-0-65.sty)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-1-18.sty))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex)) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgffor.code.
+tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tik
+z.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibrarypl
+othandlers.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmodulematri
+x.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarytopaths.code.tex))))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/dvipsnam.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/svgnam.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/x11nam.def)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryautomata.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.multipart.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.multipart.code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryarrows.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibraryar
+rows.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarybackgrounds.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryfit.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarypositioning.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.geometric.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.geometric.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.misc.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.misc.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.symbols.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.symbols.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.arrows.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.arrows.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.callouts.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.callouts.code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/l3backend/l3backend-pdftex.d
+ef)
+No file diagram.aux.
+(/usr/local/texlive/2024basic/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.s
+ty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+))
+! Illegal parameter number in definition of \pgfkeys@temp.
+<to be read again> 
+                   C
+l.14 ...4D6, minimum size=1cm, ellipse}, >=latex']
+                                                  
+! Illegal parameter number in definition of \tikz@temp.
+<to be read again> 
+                   C
+l.15     \node (
+                seed) at (0,0) {\textbf{Seed}};
+! Illegal parameter number in definition of \tikz@options.
+<to be read again> 
+                   C
+l.15     \node (
+                seed) at (0,0) {\textbf{Seed}};
+! Illegal parameter number in definition of \tikz@fillcolor.
+<to be read again> 
+                   C
+l.15     \node (
+                seed) at (0,0) {\textbf{Seed}};
+! Illegal parameter number in definition of \@@clr.
+<to be read again> 
+                   C
+l.15     \node (seed) at (0,0) {\textbf{Seed}};
+                                               
+
+! Package xcolor Error: Undefined color `##C6F4D6'.
+
+See the xcolor package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15     \node (seed) at (0,0) {\textbf{Seed}};
+                                               
+
+! Package pgf Error: Unsupported color model `'. Sorry.
+
+See the pgf package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15     \node (seed) at (0,0) {\textbf{Seed}};
+                                               
+! Illegal parameter number in definition of \@@clr.
+<to be read again> 
+                   C
+l.15     \node (seed) at (0,0) {\textbf{Seed}};
+                                               
+
+! Package xcolor Error: Undefined color `##C6F4D6'.
+
+See the xcolor package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15     \node (seed) at (0,0) {\textbf{Seed}};
+                                               
+! Missing \endcsname inserted.
+<to be read again> 
+                   \let 
+l.15     \node (seed) at (0,0) {\textbf{Seed}};
+                                               
+)
+! Incomplete \ifx; all text was ignored after line 15.
+<inserted text> 
+                \fi 
+<*> ...3dv23184qdr0000gn/T/tmp4uwik3nn/diagram.tex
+                                                  
+! Emergency stop.
+<*> ...3dv23184qdr0000gn/T/tmp4uwik3nn/diagram.tex
+                                                  
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on diagram.log.
+
+2025-01-18 20:19:37,877 - ERROR - Error in render_tikz: Error: Invalid color name used in diagram. Please use standard color names or RGB values.
+2025-01-18 20:22:50,132 - INFO - Initializing TikZGUI
+2025-01-18 20:22:50,271 - INFO - Initializing NVIDIA API client
+2025-01-18 20:22:50,271 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:22:50,299 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:24:49,938 - INFO - Initializing TikZGUI
+2025-01-18 20:24:50,082 - INFO - Initializing NVIDIA API client
+2025-01-18 20:24:50,083 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:24:50,110 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:24:50,260 - INFO - TikZGUI initialization complete
+2025-01-18 20:24:53,267 - DEBUG - Using selector: KqueueSelector
+2025-01-18 20:24:53,271 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'user', 'content': "\nPlease create a TikZ diagram based on this description: red circle\n\nImportant requirements:\n1. Use ONLY RGB colors in format like 'rgb,255:red,173;green,216;blue,230' - DO NOT use named colors\n2. Include all necessary TikZ libraries\n3. Make the diagram clean and professional\n4. Respond with a brief explanation followed by the code in a tikz code block\n"}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:24:53,301 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:24:53,302 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:24:53,329 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11486ef90>
+2025-01-18 20:24:53,329 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10753ecc0> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:24:53,422 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x1148b8410>
+2025-01-18 20:24:53,422 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:24:53,422 - DEBUG - send_request_headers.complete
+2025-01-18 20:24:53,422 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:24:53,422 - DEBUG - send_request_body.complete
+2025-01-18 20:24:53,422 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:24:55,652 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:24:55 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'833'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'7b05a49a-18aa-4613-ad3b-365c72726014'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:24:55,652 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:24:55,652 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:24:55,652 - DEBUG - receive_response_body.complete
+2025-01-18 20:24:55,652 - DEBUG - response_closed.started
+2025-01-18 20:24:55,652 - DEBUG - response_closed.complete
+2025-01-18 20:24:55,652 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:24:55 GMT'), ('content-type', 'application/json'), ('content-length', '833'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '7b05a49a-18aa-4613-ad3b-365c72726014'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:24:55,652 - DEBUG - request_id: None
+2025-01-18 20:24:55,657 - ERROR - Error processing response: 'ChatCompletion' object has no attribute 'get'
+2025-01-18 20:25:46,030 - INFO - Initializing TikZGUI
+2025-01-18 20:25:46,164 - INFO - Initializing NVIDIA API client
+2025-01-18 20:25:46,164 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:25:46,189 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:25:46,332 - INFO - TikZGUI initialization complete
+2025-01-18 20:25:49,076 - ERROR - Error generating diagram: 'OpenAI' object has no attribute 'chat_completion'
+2025-01-18 20:27:25,659 - INFO - Initializing TikZGUI
+2025-01-18 20:27:25,792 - INFO - Initializing NVIDIA API client
+2025-01-18 20:27:25,793 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:27:25,818 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:27:59,051 - INFO - Initializing TikZGUI
+2025-01-18 20:27:59,164 - INFO - Initializing NVIDIA API client
+2025-01-18 20:27:59,164 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:27:59,180 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:27:59,344 - INFO - TikZGUI initialization complete
+2025-01-18 20:28:02,901 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'user', 'content': "\nPlease create a TikZ diagram based on this description: red circle\n\nImportant requirements:\n1. Use ONLY RGB colors in format like 'rgb,255:red,173;green,216;blue,230' - DO NOT use named colors\n2. Include all necessary TikZ libraries\n3. Make the diagram clean and professional\n4. Respond with a brief explanation followed by the code in a tikz code block\n"}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:28:02,927 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:28:02,927 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:28:02,930 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x121b2e3c0>
+2025-01-18 20:28:02,931 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x112f8acc0> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:28:03,031 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x121b6c7d0>
+2025-01-18 20:28:03,031 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:28:03,032 - DEBUG - send_request_headers.complete
+2025-01-18 20:28:03,032 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:28:03,032 - DEBUG - send_request_body.complete
+2025-01-18 20:28:03,032 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:28:05,128 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:28:05 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'833'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'398eb44b-4fc4-4668-8927-0027a3f3d8e4'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:28:05,130 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:28:05,130 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:28:05,131 - DEBUG - receive_response_body.complete
+2025-01-18 20:28:05,131 - DEBUG - response_closed.started
+2025-01-18 20:28:05,131 - DEBUG - response_closed.complete
+2025-01-18 20:28:05,131 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:28:05 GMT'), ('content-type', 'application/json'), ('content-length', '833'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '398eb44b-4fc4-4668-8927-0027a3f3d8e4'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:28:05,131 - DEBUG - request_id: None
+2025-01-18 20:34:26,037 - INFO - Initializing TikZGUI
+2025-01-18 20:34:26,167 - INFO - Initializing NVIDIA API client
+2025-01-18 20:34:26,167 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:34:26,192 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:34:26,367 - INFO - TikZGUI initialization complete
+2025-01-18 20:34:32,123 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'user', 'content': "\nPlease create a TikZ diagram based on this description: red circle\n\nImportant requirements:\n1. Use ONLY RGB colors in format like 'rgb,255:red,173;green,216;blue,230' - DO NOT use named colors\n2. Include all necessary TikZ libraries\n3. Make the diagram clean and professional\n4. Respond with a brief explanation followed by the code in a tikz code block\n"}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:34:32,153 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:34:32,153 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:34:32,179 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x1177423c0>
+2025-01-18 20:34:32,179 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10a40ed50> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:34:32,282 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x1177807d0>
+2025-01-18 20:34:32,282 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:34:32,282 - DEBUG - send_request_headers.complete
+2025-01-18 20:34:32,283 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:34:32,283 - DEBUG - send_request_body.complete
+2025-01-18 20:34:32,283 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:34:34,107 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:34:34 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'805'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'3e07119d-40e4-414c-aa03-756c188057b7'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:34:34,109 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:34:34,110 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:34:34,110 - DEBUG - receive_response_body.complete
+2025-01-18 20:34:34,110 - DEBUG - response_closed.started
+2025-01-18 20:34:34,110 - DEBUG - response_closed.complete
+2025-01-18 20:34:34,111 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:34:34 GMT'), ('content-type', 'application/json'), ('content-length', '805'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '3e07119d-40e4-414c-aa03-756c188057b7'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:34:34,111 - DEBUG - request_id: None
+2025-01-18 20:34:43,951 - INFO - Initializing TikZGUI
+2025-01-18 20:34:44,066 - INFO - Initializing NVIDIA API client
+2025-01-18 20:34:44,066 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:34:44,082 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:34:44,245 - INFO - TikZGUI initialization complete
+2025-01-18 20:34:47,570 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'user', 'content': "\nPlease create a TikZ diagram based on this description: red circle\n\nImportant requirements:\n1. Use ONLY RGB colors in format like 'rgb,255:red,173;green,216;blue,230' - DO NOT use named colors\n2. Include all necessary TikZ libraries\n3. Make the diagram clean and professional\n4. Respond with a brief explanation followed by the code in a tikz code block\n"}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:34:47,597 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:34:47,597 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:34:47,601 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x12182e3c0>
+2025-01-18 20:34:47,601 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x110e42cc0> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:34:47,703 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x12186c7d0>
+2025-01-18 20:34:47,704 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:34:47,704 - DEBUG - send_request_headers.complete
+2025-01-18 20:34:47,704 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:34:47,704 - DEBUG - send_request_body.complete
+2025-01-18 20:34:47,704 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:34:49,467 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:34:49 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'805'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'0a779732-7270-49b8-b850-899211a41459'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:34:49,469 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:34:49,469 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:34:49,470 - DEBUG - receive_response_body.complete
+2025-01-18 20:34:49,470 - DEBUG - response_closed.started
+2025-01-18 20:34:49,470 - DEBUG - response_closed.complete
+2025-01-18 20:34:49,470 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:34:49 GMT'), ('content-type', 'application/json'), ('content-length', '805'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '0a779732-7270-49b8-b850-899211a41459'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:34:49,470 - DEBUG - request_id: None
+2025-01-18 20:34:54,939 - INFO - Initializing TikZGUI
+2025-01-18 20:34:55,050 - INFO - Initializing NVIDIA API client
+2025-01-18 20:34:55,050 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:34:55,067 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:34:55,234 - INFO - TikZGUI initialization complete
+2025-01-18 20:34:57,691 - DEBUG - Request options: {'method': 'post', 'url': '/chat/completions', 'files': None, 'json_data': {'messages': [{'role': 'system', 'content': 'You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create \nTikZ diagrams based on their descriptions. Follow these guidelines:\n1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:\n\x08egin{tikzpicture}\n% Your TikZ commands here\n\\end{tikzpicture}\n2. Use appropriate TikZ libraries when needed\n3. Keep the code clean and well-commented\n4. Ensure the diagram fits within reasonable dimensions\n'}, {'role': 'user', 'content': "\nPlease create a TikZ diagram based on this description: red circle\n\nImportant requirements:\n1. Use ONLY RGB colors in format like 'rgb,255:red,173;green,216;blue,230' - DO NOT use named colors\n2. Include all necessary TikZ libraries\n3. Make the diagram clean and professional\n4. Respond with a brief explanation followed by the code in a tikz code block\n"}], 'model': 'meta/llama-3.3-70b-instruct', 'max_tokens': 1024, 'temperature': 0.01, 'top_p': 0.7}}
+2025-01-18 20:34:57,718 - DEBUG - Sending HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions
+2025-01-18 20:34:57,719 - DEBUG - connect_tcp.started host='integrate.api.nvidia.com' port=443 local_address=None timeout=5.0 socket_options=None
+2025-01-18 20:34:57,723 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x1141ce3c0>
+2025-01-18 20:34:57,723 - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x10cf8acc0> server_hostname='integrate.api.nvidia.com' timeout=5.0
+2025-01-18 20:34:57,828 - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11420c7d0>
+2025-01-18 20:34:57,828 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-18 20:34:57,828 - DEBUG - send_request_headers.complete
+2025-01-18 20:34:57,828 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-18 20:34:57,829 - DEBUG - send_request_body.complete
+2025-01-18 20:34:57,829 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-18 20:34:59,605 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 19 Jan 2025 04:34:59 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'805'), (b'Connection', b'keep-alive'), (b'Access-Control-Allow-Credentials', b'true'), (b'Access-Control-Expose-Headers', b'nvcf-reqid'), (b'Nvcf-Reqid', b'00599e86-10a6-4d2e-bb4e-13b24a958a83'), (b'Nvcf-Status', b'fulfilled'), (b'Server', b'uvicorn'), (b'Vary', b'Origin'), (b'Vary', b'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:34:59,607 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-01-18 20:34:59,607 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-18 20:34:59,608 - DEBUG - receive_response_body.complete
+2025-01-18 20:34:59,608 - DEBUG - response_closed.started
+2025-01-18 20:34:59,608 - DEBUG - response_closed.complete
+2025-01-18 20:34:59,608 - DEBUG - HTTP Response: POST https://integrate.api.nvidia.com/v1/chat/completions "200 OK" Headers([('date', 'Sun, 19 Jan 2025 04:34:59 GMT'), ('content-type', 'application/json'), ('content-length', '805'), ('connection', 'keep-alive'), ('access-control-allow-credentials', 'true'), ('access-control-expose-headers', 'nvcf-reqid'), ('nvcf-reqid', '00599e86-10a6-4d2e-bb4e-13b24a958a83'), ('nvcf-status', 'fulfilled'), ('server', 'uvicorn'), ('vary', 'Origin'), ('vary', 'origin, access-control-request-method, access-control-request-headers')])
+2025-01-18 20:34:59,609 - DEBUG - request_id: None
+2025-01-18 20:35:04,758 - INFO - Initializing TikZGUI
+2025-01-18 20:35:04,871 - INFO - Initializing NVIDIA API client
+2025-01-18 20:35:04,871 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:35:04,887 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:35:10,348 - INFO - Initializing TikZGUI
+2025-01-18 20:35:10,458 - INFO - Initializing NVIDIA API client
+2025-01-18 20:35:10,458 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:35:10,475 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:35:14,155 - INFO - Initializing TikZGUI
+2025-01-18 20:35:14,273 - INFO - Initializing NVIDIA API client
+2025-01-18 20:35:14,273 - INFO - Using API key: nvapi-rM2q...
+2025-01-18 20:35:14,289 - INFO - NVIDIA API client initialized successfully
+2025-01-18 20:35:14,427 - INFO - TikZGUI initialization complete
+2025-01-18 20:35:16,680 - ERROR - Error generating diagram: 'OpenAI' object has no attribute 'chat_completion'
