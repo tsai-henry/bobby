@@ -14,18 +14,20 @@ from pdf2image import convert_from_path
 import sys
 from dotenv import load_dotenv
 import asyncio
+import shutil
 
 # Global Constants and Configuration
 WINDOW_SIZE = "1200x800"
 WINDOW_TITLE = "Bobby"
 UPDATE_DELAY = 500  # ms for code preview updates
 LINE_LENGTH = 60  # characters per line for message bubbles
-LOADING_INTERVAL = 300  # ms between loading indicator updates
-MIN_BUBBLE_WIDTH = 30  # minimum width for message bubbles
-CHARS_PER_WIDTH_UNIT = 4  # number of characters per width unit
-MAX_BUBBLE_WIDTH = 200  # maximum width for message bubbles
-FONT_SIZE = 14  # base font size for text
-LOADING_SIZE = 150  # size of loading indicator
+LOADING_INTERVAL = 700  # ms between loading indicator updates
+MIN_BUBBLE_WIDTH = 50  # minimum width for message bubbles
+CHARS_PER_WIDTH_UNIT = 1  # number of characters per width unit
+MAX_BUBBLE_WIDTH = 300  # maximum width for message bubbles
+FONT_SIZE = 18  # base font size for text
+LOADING_SIZE = 50  # size of loading indicator
+CHAT_WIDTH = 500  # width of chat frame
 
 # UI Colors
 DARK_BG = "#1E1E1E"
@@ -65,7 +67,10 @@ Output ONLY the detailed prompt without any explanations or additional text."""
 
 TIKZ_SYSTEM_PROMPT = """You are an expert in TikZ, a powerful drawing tool for LaTeX. Your task is to help users create 
 TikZ diagrams based on their descriptions. Follow these guidelines:
-1. Generate valid TikZ code that can be compiled
+1. Generate ONLY valid TikZ code. Your response must follow this EXACT format:
+\begin{tikzpicture}
+% Your TikZ commands here
+\end{tikzpicture}
 2. Use appropriate TikZ libraries when needed
 3. Keep the code clean and well-commented
 4. Ensure the diagram fits within reasonable dimensions
@@ -90,40 +95,29 @@ class MessageBubble(ctk.CTkFrame):
         
         # Configure grid
         self.grid_columnconfigure(1 if is_user else 0, weight=1)
-        self.grid_columnconfigure(0 if is_user else 1, weight=2)  # More space on the opposite side
+        self.grid_columnconfigure(0 if is_user else 1, weight=2)
         
-        # Calculate appropriate dimensions based on message length
-        max_line_length = max(len(line) for line in message.split('\n'))
-        num_lines = (len(message) // LINE_LENGTH) + message.count('\n') + 1
-        estimated_height = max(25, min(300, num_lines * 20))
-        
-        # Calculate width based on content
-        content_width = min(MAX_BUBBLE_WIDTH, max(MIN_BUBBLE_WIDTH, max_line_length * CHARS_PER_WIDTH_UNIT))
-        
-        self.message = ctk.CTkTextbox(
+        # Create message label
+        self.message = ctk.CTkLabel(
             self,
-            wrap="word",
-            height=estimated_height,
-            width=content_width,
+            text=message,
+            wraplength=MAX_BUBBLE_WIDTH,
             fg_color=USER_BUBBLE_COLOR if is_user else ASSISTANT_BUBBLE_COLOR,
             text_color="white",
             corner_radius=15,
             font=("Helvetica", FONT_SIZE),
-            activate_scrollbars=False
+            justify="left",
+            padx=10,
+            pady=5
         )
         
-        # Insert and configure text
-        self.message.insert("1.0", message)
-        self.message.configure(state="disabled")
-        
         # Position the bubble
-        col = 1 if is_user else 0
         self.message.grid(
             row=0,
-            column=col,
-            padx=(10 if not is_user else 0, 0 if is_user else 10),
-            pady=3,
-            sticky="ew"
+            column=1 if is_user else 0,
+            padx=(5 if not is_user else 0, 0 if is_user else 5),
+            pady=2,
+            sticky="e" if is_user else "w"
         )
 
 class ChatFrame(ctk.CTkScrollableFrame):
@@ -132,24 +126,46 @@ class ChatFrame(ctk.CTkScrollableFrame):
             parent,
             fg_color=DARK_BG,
             corner_radius=15,
-            width=400  # Fixed width for chat frame
+            width=CHAT_WIDTH,
+            height=400  # Fixed height for smooth scrolling
         )
         self.grid_columnconfigure(0, weight=1)
         
+        # Keep track of messages for smooth scrolling
+        self.messages = []
+        self.current_scroll = 0.0
+        self.target_scroll = 0.0
+        self.animation_id = None
+    
     def add_message(self, message, is_user=True):
-        # Add some spacing between messages
         if len(self.grid_slaves()) > 0:
             spacer = ctk.CTkFrame(self, fg_color="transparent", height=2)
             spacer.grid(row=len(self.grid_slaves()), column=0, sticky="ew")
         
         bubble = MessageBubble(self, message, is_user)
         bubble.grid(row=len(self.grid_slaves()), column=0, sticky="ew")
+        self.messages.append(bubble)
         
-        # Scroll to bottom
-        self.after(100, self._scroll_to_bottom)
+        # Start smooth scroll animation
+        self.target_scroll = 1.0
+        if self.animation_id:
+            self.after_cancel(self.animation_id)
+        self.smooth_scroll_to_bottom()
     
-    def _scroll_to_bottom(self):
-        self._parent_canvas.yview_moveto(1.0)
+    def smooth_scroll_to_bottom(self):
+        """Smoothly scroll to the bottom of the chat"""
+        try:
+            current = float(self._parent_canvas.yview()[1])
+            if abs(self.target_scroll - current) > 0.01:
+                next_pos = current + (self.target_scroll - current) * 0.3
+                self._parent_canvas.yview_moveto(next_pos)
+                self.animation_id = self.after(20, self.smooth_scroll_to_bottom)
+            else:
+                self._parent_canvas.yview_moveto(1.0)
+                self.animation_id = None
+        except Exception as e:
+            logging.error(f"Scroll error: {str(e)}")
+            self._parent_canvas.yview_moveto(1.0)
 
 class CodeView(ctk.CTkTextbox):
     def __init__(self, *args, **kwargs):
@@ -233,7 +249,7 @@ class LoadingIndicator(ctk.CTkLabel):
     def __init__(self, parent):
         super().__init__(
             parent,
-            text="",
+            text="◐",
             fg_color="transparent",
             width=LOADING_SIZE,
             height=LOADING_SIZE,
@@ -242,18 +258,12 @@ class LoadingIndicator(ctk.CTkLabel):
         )
         self.animation_frames = ["◐", "◓", "◑", "◒"]
         self.frame_index = 0
-        
-        # Center the loading indicator
-        self.place_forget()  # Remove grid placement
+        self.is_running = False
         
     def start(self):
         self.is_running = True
-        # Center in parent widget
-        parent_width = self.master.winfo_width()
-        parent_height = self.master.winfo_height()
-        x = parent_width // 2 - LOADING_SIZE // 2
-        y = parent_height // 2 - LOADING_SIZE // 2
-        self.place(x=x, y=y)
+        self.lift()  # Bring to front
+        self.place(relx=0.5, rely=0.5, anchor="center")  # Center in parent
         self.update_animation()
     
     def stop(self):
@@ -310,57 +320,32 @@ class TikZGUI:
         logging.info("TikZGUI initialization complete")
     
     def create_gui_elements(self):
-        # Main content frame (top part)
+        # Configure root grid
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(0, weight=1)
+        
+        # Main content frame
         content_frame = ctk.CTkFrame(self.root, fg_color=DARK_BG)
-        content_frame.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=10, pady=(10, 0))
+        content_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=(10, 0))
         content_frame.grid_columnconfigure(0, weight=1)
-        content_frame.grid_columnconfigure(1, weight=0)  # For the divider
+        content_frame.grid_columnconfigure(1, weight=0)
         content_frame.grid_columnconfigure(2, weight=1)
         content_frame.grid_rowconfigure(0, weight=1)
         
-        # Left Panel (Code/Chat View)
-        self.left_frame = ctk.CTkFrame(content_frame, fg_color=DARK_BG)
+        # Left Panel
+        self.left_frame = ctk.CTkFrame(content_frame, fg_color=DARK_BG, width=CHAT_WIDTH)
         self.left_frame.grid(row=0, column=0, sticky="nsew")
-        self.left_frame.grid_rowconfigure(0, weight=1)
+        self.left_frame.grid_propagate(False)  # Maintain width
         self.left_frame.grid_columnconfigure(0, weight=1)
+        self.left_frame.grid_rowconfigure(0, weight=0)  # For toggle
+        self.left_frame.grid_rowconfigure(1, weight=1)  # For chat/code
         
-        # Create both chat and code views
-        self.chat_frame = ChatFrame(self.left_frame)
-        self.chat_frame.grid(row=0, column=0, sticky="n", padx=200)  # Center the chat frame
+        # View toggle at top
+        toggle_frame = ctk.CTkFrame(self.left_frame, fg_color="transparent")
+        toggle_frame.grid(row=0, column=0, pady=10)
         
-        self.code_view = CodeView(self.left_frame)
-        self.code_view.configure(font=("Courier", FONT_SIZE))
-        self.code_view.grid(row=0, column=0, sticky="nsew")
-        self.code_view.grid_remove()  # Initially hidden
-        
-        # Create a resizable divider
-        self.divider = ctk.CTkFrame(content_frame, width=5, fg_color="gray30", cursor="sb_h_double_arrow")
-        self.divider.grid(row=0, column=1, sticky="ns")
-        self.divider.bind("<B1-Motion>", self.resize_panels)
-        self.divider.bind("<Button-1>", self.start_resize)
-        self.divider.bind("<ButtonRelease-1>", self.stop_resize)
-        
-        # Right Panel (Diagram Display)
-        right_frame = ctk.CTkFrame(content_frame, fg_color=DARK_BG)
-        right_frame.grid(row=0, column=2, sticky="nsew")
-        right_frame.grid_columnconfigure(0, weight=1)
-        right_frame.grid_rowconfigure(0, weight=1)
-        
-        # Canvas for diagram display
-        self.canvas = ctk.CTkCanvas(right_frame, bg=DARK_BG, highlightthickness=0)
-        self.canvas.grid(row=0, column=0, sticky="nsew")
-        
-        # Loading indicator
-        self.loading_indicator = LoadingIndicator(self.canvas)
-        
-        # Bottom input area with view toggle
-        input_frame = ctk.CTkFrame(self.root, fg_color="#2B2B2B", corner_radius=15, height=90)
-        input_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
-        input_frame.grid_columnconfigure(1, weight=1)
-        
-        # View toggle segmented button
         self.view_toggle = ctk.CTkSegmentedButton(
-            input_frame,
+            toggle_frame,
             values=["Chat", "Code"],
             command=self.toggle_view,
             selected_color=USER_BUBBLE_COLOR,
@@ -368,19 +353,83 @@ class TikZGUI:
             selected_hover_color=USER_BUBBLE_COLOR,
             unselected_hover_color="gray40",
             width=120,
+            height=32,
             font=("Helvetica", FONT_SIZE)
         )
-        self.view_toggle.grid(row=0, column=0, padx=(10, 20), pady=10)
+        self.view_toggle.pack(pady=5)
         self.view_toggle.set("Chat")
+        
+        # Container frame for chat and code views
+        self.view_container = ctk.CTkFrame(self.left_frame, fg_color=DARK_BG)
+        self.view_container.grid(row=1, column=0, sticky="nsew")
+        self.view_container.grid_columnconfigure(0, weight=1)
+        self.view_container.grid_rowconfigure(0, weight=1)
+        
+        # Chat Frame
+        self.chat_frame = ChatFrame(self.view_container)
+        self.chat_frame.grid(row=0, column=0, sticky="nsew", padx=50)
+        
+        # Code View
+        self.code_view = CodeView(self.view_container)
+        self.code_view.configure(font=("Courier", FONT_SIZE))
+        self.code_view.grid(row=0, column=0, sticky="nsew", padx=10)
+        self.code_view.grid_remove()
+        
+        # Resizable divider
+        self.divider = ctk.CTkFrame(content_frame, width=5, fg_color="gray30")
+        self.divider.grid(row=0, column=1, sticky="ns")
+        self.divider.bind("<Enter>", lambda e: self.divider.configure(cursor="sb_h_double_arrow"))
+        self.divider.bind("<Leave>", lambda e: self.divider.configure(cursor=""))
+        self.divider.bind("<B1-Motion>", self.resize_panels)
+        self.divider.bind("<Button-1>", self.start_resize)
+        self.divider.bind("<ButtonRelease-1>", self.stop_resize)
+        
+        # Right Panel
+        right_frame = ctk.CTkFrame(content_frame, fg_color=DARK_BG)
+        right_frame.grid(row=0, column=2, sticky="nsew")
+        right_frame.grid_columnconfigure(0, weight=1)
+        right_frame.grid_rowconfigure(0, weight=1)
+        
+        # Canvas for diagram
+        self.canvas = ctk.CTkCanvas(right_frame, bg="white", highlightthickness=0)
+        self.canvas.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+        
+        # Bottom input area
+        input_frame = ctk.CTkFrame(self.root, fg_color="#2B2B2B", corner_radius=15, height=60)
+        input_frame.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
+        input_frame.grid_columnconfigure(1, weight=1)
+        input_frame.grid_propagate(False)
+        
+        # Loading indicator
+        self.loading_indicator = LoadingIndicator(input_frame)
+        self.loading_indicator.grid(row=0, column=0, padx=10)
         
         # Input field
         self.input_text = ctk.CTkTextbox(
             input_frame,
-            height=50,
+            height=40,
             corner_radius=10,
-            font=("Helvetica", FONT_SIZE)
+            font=("Helvetica", FONT_SIZE),
+            wrap="word",
+            fg_color="#383B42",
+            text_color="white"
         )
-        self.input_text.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady=(20, 20))
+        self.input_text.grid(row=0, column=1, sticky="ew", padx=5, pady=10)
+        self.input_text.insert("1.0", "Describe the diagram you want to create...")
+        
+        # Enter button
+        self.enter_button = ctk.CTkButton(
+            input_frame,
+            text="➜",
+            width=40,
+            height=40,
+            corner_radius=20,
+            fg_color=USER_BUBBLE_COLOR,
+            hover_color="#1E3EAC",
+            font=("Helvetica", FONT_SIZE),
+            command=lambda: self.on_enter_pressed(None)
+        )
+        self.enter_button.grid(row=0, column=2, padx=10)
         
         # Bind events
         self.input_text.bind("<FocusIn>", lambda e: self.on_input_focus_in())
@@ -388,31 +437,46 @@ class TikZGUI:
         self.input_text.bind("<Return>", lambda e: self.on_enter_pressed(e))
         self.input_text.bind("<Key>", lambda e: self.on_key_press(e))
         
+        # Add welcome message
+        self.chat_frame.add_message("Welcome! Describe the diagram you want to create.", is_user=False)
+    
+    def toggle_view(self, value=None):
+        """Toggle between chat and code views"""
+        if value is not None:
+            self.show_chat = value == "Chat"
+            self.view_toggle.set(value)
+        else:
+            self.show_chat = not self.show_chat
+            self.view_toggle.set("Chat" if self.show_chat else "Code")
+            
+        if self.show_chat:
+            self.code_view.grid_remove()
+            self.chat_frame.grid(row=0, column=0, sticky="nsew", padx=50)
+            # Ensure latest messages are visible
+            self.chat_frame.smooth_scroll_to_bottom()
+        else:
+            self.chat_frame.grid_remove()
+            self.code_view.grid(row=0, column=0, sticky="nsew", padx=10)
+            if self.current_code:
+                self.code_view.set_code(self.current_code)
+    
     def start_resize(self, event):
+        """Start panel resizing operation"""
         self.root.config(cursor="sb_h_double_arrow")
         self.resize_start_x = event.x_root
         self.initial_width = self.left_frame.winfo_width()
-        
+    
     def stop_resize(self, event):
+        """Stop panel resizing operation"""
         self.root.config(cursor="")
         
     def resize_panels(self, event):
+        """Handle panel resizing during mouse drag"""
         if not hasattr(self, 'resize_start_x'):
             return
         diff = event.x_root - self.resize_start_x
-        new_width = max(200, min(self.initial_width + diff, self.root.winfo_width() - 400))
+        new_width = max(400, min(self.initial_width + diff, self.root.winfo_width() - 400))
         self.left_frame.configure(width=new_width)
-    
-    def toggle_view(self):
-        self.show_chat = self.view_toggle.get() == "Chat"
-        if self.show_chat:
-            self.code_view.grid_remove()
-            self.chat_frame.grid(row=0, column=0, sticky="n", padx=200)
-        else:
-            self.chat_frame.grid_remove()
-            self.code_view.grid(row=0, column=0, sticky="nsew")
-            if self.current_code:
-                self.code_view.set_code(self.current_code)
     
     def on_input_focus_in(self):
         if self.input_text.get("1.0", "end-1c") == "Describe the diagram you want to create...":
@@ -538,78 +602,92 @@ class TikZGUI:
             self.result_queue.put({"error": str(e)})
     
     def render_tikz(self, tikz_code):
+        """Render TikZ code to PDF and convert to PNG"""
         try:
-            logging.info("Starting TikZ rendering")
-            if not tikz_code or not tikz_code.strip():
-                raise ValueError("Empty TikZ code")
-                
-            logging.debug(f"Rendering code: {tikz_code}")
-            
             # Create temp directory
             temp_dir = tempfile.mkdtemp()
             logging.debug(f"Created temp directory: {temp_dir}")
             
-            # Create LaTeX document
-            latex_content = r"""\documentclass{standalone}
+            # Extract the tikzpicture environment
+            tikz_content = tikz_code
+            if "\\begin{tikzpicture}" in tikz_code:
+                start = tikz_code.find("\\begin{tikzpicture}")
+                end = tikz_code.find("\\end{tikzpicture}") + len("\\end{tikzpicture}")
+                tikz_content = tikz_code[start:end]
+            
+            # Create LaTeX document with proper color definitions
+            latex_code = r"""
+\documentclass[tikz,border=10pt]{standalone}
 \usepackage{tikz}
+\usepackage[dvipsnames,svgnames,x11names]{xcolor}
+\usetikzlibrary{automata,arrows,backgrounds,fit,positioning,shapes}
+
+% Define custom colors
+\definecolor{lightblue}{RGB}{173,216,230}
+\definecolor{lightred}{RGB}{255,182,193}
+\definecolor{lightgreen}{RGB}{144,238,144}
+\definecolor{lightyellow}{RGB}{255,255,224}
+\definecolor{lightgray}{RGB}{211,211,211}
+
 \begin{document}
 %s
 \end{document}
-""" % tikz_code
-
-            # Write LaTeX file
-            tex_path = os.path.join(temp_dir, "diagram.tex")
-            with open(tex_path, "w") as f:
-                f.write(latex_content)
-            logging.debug(f"Wrote LaTeX file: {tex_path}")
+""" % tikz_content
+            
+            tex_file = os.path.join(temp_dir, "diagram.tex")
+            with open(tex_file, "w") as f:
+                f.write(latex_code)
+            logging.debug(f"Wrote LaTeX file: {tex_file}")
             
             # Run pdflatex
             logging.info("Running pdflatex")
-            pdf_path = os.path.join(temp_dir, "diagram.pdf")
-            result = subprocess.run(
-                ["pdflatex", "-interaction=nonstopmode", "-output-directory", temp_dir, tex_path],
+            process = subprocess.run(
+                ["pdflatex", "-interaction=nonstopmode", tex_file],
+                cwd=temp_dir,
                 capture_output=True,
                 text=True
             )
             
-            if result.returncode != 0:
-                error_msg = result.stderr or result.stdout
-                logging.error(f"pdflatex error: {error_msg}")
-                raise RuntimeError(f"Failed to compile LaTeX: {error_msg}")
+            if process.returncode != 0:
+                logging.error(f"pdflatex error: {process.stdout}")
+                error_msg = process.stdout
+                if "Undefined color" in error_msg:
+                    error_msg = "Error: Invalid color name used in diagram. Please use standard color names or RGB values."
+                elif "Illegal parameter" in error_msg:
+                    error_msg = "Error: Invalid TikZ parameters. Please check your node and path specifications."
+                raise Exception(error_msg)
             
-            if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
-                raise RuntimeError("PDF file was not created or is empty")
+            # Convert PDF to PNG
+            pdf_file = os.path.join(temp_dir, "diagram.pdf")
+            png_file = os.path.join(temp_dir, "diagram.png")
             
-            # Convert PDF to image
-            logging.info("Converting PDF to image")
-            try:
-                images = convert_from_path(pdf_path)
-                if not images:
-                    raise RuntimeError("No images were generated from PDF")
-                    
-                image = images[0]
-                logging.info("Successfully converted PDF to image")
-                
-                # Update canvas with new image
-                self.update_canvas_with_image(image)
-                
-            except Exception as e:
-                logging.error(f"Error converting PDF to image: {str(e)}")
-                raise RuntimeError(f"Failed to convert PDF to image: {str(e)}")
-                
+            dpi = 300
+            pages = convert_from_path(pdf_file, dpi)
+            pages[0].save(png_file, "PNG")
+            
+            # Load PNG into PhotoImage
+            image = Image.open(png_file)
+            photo = ImageTk.PhotoImage(image)
+            
+            # Clear canvas and display image
+            self.canvas.delete("all")
+            self.canvas.create_image(
+                self.canvas.winfo_width() / 2,
+                self.canvas.winfo_height() / 2,
+                image=photo,
+                anchor="center"
+            )
+            self.canvas.image = photo  # Keep reference
+            
+            # Clean up
+            shutil.rmtree(temp_dir)
+            return True
+            
         except Exception as e:
             logging.error(f"Error in render_tikz: {str(e)}")
             self.chat_frame.add_message(f"Error rendering diagram: {str(e)}", is_user=False)
-        finally:
-            # Clean up temp directory
-            try:
-                if 'temp_dir' in locals():
-                    import shutil
-                    shutil.rmtree(temp_dir)
-            except Exception as e:
-                logging.error(f"Error cleaning up temp directory: {str(e)}")
+            return False
 
-    
     def render_tikz_async(self, tikz_code):
         # Start async task
         threading.Thread(target=self.render_tikz, args=(tikz_code,)).start()
